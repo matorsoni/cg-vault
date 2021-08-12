@@ -1,3 +1,6 @@
 [submodule "deps/glfw"]
 	path = deps/glfw
 	url = git@github.com:glfw/glfw.git
+[submodule "deps/glad"]
+	path = deps/glad
+	url = git@github.com:Dav1dde/glad.git
