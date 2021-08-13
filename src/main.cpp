@@ -51,6 +51,7 @@ int main()
 
     // Get frame buffer size and set OpenGL viewport dimensions.
     // Should normally be the same size as the window.
+    // Put inside game loop to render correctly when resizing the window.
     {
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -64,6 +65,10 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        tock = glfwGetTime();
+        std::cout << "Time per frame: " << 1000.0 * (tock - tick) << std::endl;
+        tick = tock;
     }
 
     glfwDestroyWindow(window);
