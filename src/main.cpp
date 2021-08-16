@@ -5,7 +5,7 @@
 #include <iostream>
 
 // GLFW error calback.
-void error_callback(int error, const char* description)
+static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
 }
@@ -48,15 +48,6 @@ int main()
 
     glfwSwapInterval(1);
     glfwSetKeyCallback(window, key_callback);
-
-    // Get frame buffer size and set OpenGL viewport dimensions.
-    // Should normally be the same size as the window.
-    // TODO: Put inside game loop to render correctly when resizing the window.
-    {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-    }
 
     // Define triangle vertices.
     float vertices[] = {
@@ -145,6 +136,14 @@ int main()
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
+        // Get frame buffer size and set OpenGL viewport dimensions.
+        // Should normally be the same size as the window.
+        {
+            int width, height;
+            glfwGetFramebufferSize(window, &width, &height);
+            glViewport(0, 0, width, height);
+        }
+
         glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
