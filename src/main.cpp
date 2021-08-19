@@ -31,7 +31,7 @@ int main()
     const int window_height = 480;
     // Set minimum OpenGL version expected by the context.
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Demo", NULL, NULL);
     if (!window) {
         std::cout << "Failed to create window." << std::endl;
@@ -45,6 +45,8 @@ int main()
         glfwTerminate();
         return -1;
     }
+
+    std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
     glfwSwapInterval(1);
     glfwSetKeyCallback(window, key_callback);
