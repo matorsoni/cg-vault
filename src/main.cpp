@@ -10,10 +10,10 @@ static void error_callback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-// GLFW key event callback.
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+// Process input with GLFW.
+static void processInput(GLFWwindow* window)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
@@ -49,7 +49,6 @@ int main()
     std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
 
     glfwSwapInterval(1);
-    glfwSetKeyCallback(window, key_callback);
 
     // Define triangle vertices.
     float vertices[] = {
@@ -143,6 +142,8 @@ int main()
     glDeleteShader(vert_shader_id);
     glDeleteShader(frag_shader_id);
 
+    // Render in wireframe mode.
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
@@ -154,6 +155,8 @@ int main()
             glfwGetFramebufferSize(window, &width, &height);
             glViewport(0, 0, width, height);
         }
+
+        processInput(window);
 
         glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
