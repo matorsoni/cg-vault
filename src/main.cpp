@@ -58,6 +58,10 @@ int main()
          0.0f,  0.5f, 0.0f
     };
 
+    unsigned int indices[] = {
+        0, 1, 2
+    };
+
     // Create Vertex Array Object.
     unsigned int vao_id;
     glGenVertexArrays(1, &vao_id);
@@ -69,6 +73,11 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // Populate VAO with Elemento Buffer Object.
+    unsigned int ebo_id;
+    glGenBuffers(1, &ebo_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // Simple vertex shader.
     const char *vert_shader_src =
@@ -152,7 +161,7 @@ int main()
         // Draw calls.
         glUseProgram(shader_program_id);
         glBindVertexArray(vao_id);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
