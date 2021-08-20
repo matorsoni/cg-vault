@@ -10,5 +10,5 @@ uniform sampler2D input_tex;
 
 void main()
 {
-    frag_color = texture(input_tex, vertex_tex)+ 0.2*(vertex_color + input_color);
+    frag_color = texture(input_tex, vertex_tex) * (vertex_color + input_color);
 }

@@ -59,12 +59,14 @@ int main()
     float vertices[] = {
         // Positions          // Colors           // Tex coords
         -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 0.0f,   1.0f, 0.0f,
-         0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.5f, 1.0f
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f
     };
 
     unsigned int indices[] = {
-        0, 1, 2
+        0, 1, 2,
+        2, 3, 0
     };
 
     // Create Vertex Array Object.
@@ -75,7 +77,7 @@ int main()
     unsigned int vbo_id;
     glGenBuffers(1, &vbo_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 32 * sizeof(float), vertices, GL_STATIC_DRAW);
     // Specify vertex positions, on layout location 0.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -89,7 +91,7 @@ int main()
     unsigned int ebo_id;
     glGenBuffers(1, &ebo_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // Load shader program.
     ShaderProgram shader_program("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
@@ -130,11 +132,12 @@ int main()
 
         processInput(window);
 
-        glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
+        glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
+        // Bind texture to specific slot.
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, tex_id);
         shader_program.use();
@@ -142,7 +145,7 @@ int main()
         shader_program.setUniform1i("input_tex", 0);
         shader_program.setUniform4f("input_color", 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(vao_id);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
