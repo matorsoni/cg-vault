@@ -1,11 +1,12 @@
+#include <cmath>
+#include <iostream>
+#include <string>
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <string>
+#include "ShaderProgram.hpp"
 
 using namespace std;
 
@@ -20,24 +21,6 @@ static void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-
-// Load shader source from the disk.
-static string loadShaderSource(const string& filename)
-{
-    string text, line;
-    ifstream file(filename);
-    if (!file) {
-        cout << "Unable to read file " << filename << endl;
-        return {};
-    }
-
-    while (getline(file, line)) {
-        text.append(line);
-        text.append("\n");
-    }
-
-    return text;
 }
 
 // Main function.
@@ -106,59 +89,8 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
-    // Simple vertex shader.
-    string vert_string = loadShaderSource("../src/shader/vertex.glsl");
-    const char* vert_shader_src = vert_string.c_str();
-    unsigned int vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert_shader_id, 1, &vert_shader_src, NULL);
-    glCompileShader(vert_shader_id);
-
-    // Simple fragment shader.
-    string frag_string = loadShaderSource("../src/shader/fragment.glsl");
-    const char* frag_shader_src = frag_string.c_str();
-    unsigned int frag_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag_shader_id, 1, &frag_shader_src, NULL);
-    glCompileShader(frag_shader_id);
-
-    // Check if shaders compiled correctly.
-    {
-        int success;
-        char info_log[512];
-
-        glGetShaderiv(vert_shader_id, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(vert_shader_id, 512, NULL, info_log);
-            cout << "Vertex shader compilation failed: \n" << info_log << endl;
-        }
-
-        glGetShaderiv(frag_shader_id, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            glGetShaderInfoLog(frag_shader_id, 512, NULL, info_log);
-            cout << "Fragment shader compilation failed: \n" << info_log << endl;
-        }
-    }
-
-    // Linking shader program.
-    unsigned int shader_program_id = glCreateProgram();
-    glAttachShader(shader_program_id, vert_shader_id);
-    glAttachShader(shader_program_id, frag_shader_id);
-    glLinkProgram(shader_program_id);
-
-    // Check if linking went well.
-    {
-        int success;
-        char info_log[512];
-        glGetProgramiv(shader_program_id, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(shader_program_id, 512, NULL, info_log);
-            cout << "Shader program linking failed: \n" << info_log << endl;
-
-        }
-    }
-
-    // Delete intermediate shader objects.
-    glDeleteShader(vert_shader_id);
-    glDeleteShader(frag_shader_id);
+    // Load shader program.
+    ShaderProgram shader_program("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
 
     // Render in wireframe mode.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -181,10 +113,9 @@ int main()
 
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
-        int color_uniform_location = glGetUniformLocation(shader_program_id, "input_color");
-        glUseProgram(shader_program_id);
+        shader_program.use();
         // Update uniform value.
-        glUniform4f(color_uniform_location, 0.0f, green, 0.0f, 1.0f);
+        shader_program.setUniform4f("input_color", 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(vao_id);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 

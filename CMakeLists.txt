@@ -10,6 +10,7 @@ add_executable(
     demo
     deps/glad/src/glad.c
     src/main.cpp
+    src/ShaderProgram.cpp
 )
 
 target_include_directories(
