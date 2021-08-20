@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 using namespace std;
 
@@ -27,7 +27,8 @@ static string loadShaderSource(const string& filename)
 
 // ShaderProgram class implementation.
 
-ShaderProgram::ShaderProgram(std::string vert_shader_path, std::string frag_shader_path):
+ShaderProgram::ShaderProgram(const string& vert_shader_path,
+                             const string& frag_shader_path):
     id_{0}
 {
     // Load vertex shader source and compile it.

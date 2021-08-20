@@ -10,7 +10,8 @@ private:
     unsigned int id_;
 
 public:
-    ShaderProgram(std::string vert_shader_path, std::string frag_shader_path);
+    ShaderProgram(const std::string& vert_shader_path,
+                  const std::string& frag_shader_path);
     ~ShaderProgram() = default;
 
     // Get shader program id.

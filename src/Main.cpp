@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 
 #include "ShaderProgram.hpp"
+#include "Texture.hpp"
 
 using namespace std;
 
@@ -61,7 +62,7 @@ int main()
         -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
          0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
          0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 0.0f,   0.0f, 1.0f
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -104,20 +105,8 @@ int main()
         0.0f, 0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
         1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f
     };
-    unsigned int tex_id;
-    glGenTextures(1, &tex_id);
-    glBindTexture(GL_TEXTURE_2D, tex_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGB, GL_FLOAT, tex_buffer);
-    // Set texture parameters. These four parameters MUST BE SET, or else we get a black texture.
-    // For setting parameters per texture object, use `glTextureParameter__` functions.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    // Generate texture mipmap.
-    glGenerateMipmap(GL_TEXTURE_2D);
-    // Unbind texture.
-    glBindTexture(GL_TEXTURE_2D, tex_id);
+
+    Texture texture("../assets/wall.jpg");
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
@@ -137,9 +126,8 @@ int main()
 
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
-        // Bind texture to specific slot.
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex_id);
+        // Bind texture.
+        texture.bind(0);
         shader_program.use();
         // Update uniform values.
         shader_program.setUniform1i("input_tex", 0);

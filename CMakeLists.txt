@@ -11,6 +11,7 @@ add_executable(
     deps/glad/src/glad.c
     src/Main.cpp
     src/ShaderProgram.cpp
+    src/Texture.cpp
 )
 
 target_include_directories(
@@ -18,6 +19,7 @@ target_include_directories(
     PRIVATE
         deps/glfw/include
         deps/glad/include
+        deps/stb
 )
 
 target_link_libraries(
