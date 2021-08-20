@@ -2,7 +2,11 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <fstream>
 #include <iostream>
+#include <string>
+
+using namespace std;
 
 // GLFW error calback.
 static void error_callback(int error, const char* description)
@@ -17,13 +21,31 @@ static void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+// Load shader source from the disk.
+static string loadShaderSource(const string& filename)
+{
+    string text, line;
+    ifstream file(filename);
+    if (!file) {
+        cout << "Unable to read file " << filename << endl;
+        return {};
+    }
+
+    while (getline(file, line)) {
+        text.append(line);
+        text.append("\n");
+    }
+
+    return text;
+}
+
 // Main function.
 int main()
 {
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit()) {
-        std::cout << "Failed to initialize GLFW." << std::endl;
+        cout << "Failed to initialize GLFW." << endl;
         return -1;
     }
 
@@ -34,19 +56,19 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Demo", NULL, NULL);
     if (!window) {
-        std::cout << "Failed to create window." << std::endl;
+        cout << "Failed to create window." << endl;
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
     if (!gladLoadGLLoader( (GLADloadproc)glfwGetProcAddress) ) {
-        std::cout << "Failed to initialize OpenGL context." << std::endl;
+        cout << "Failed to initialize OpenGL context." << endl;
         glfwTerminate();
         return -1;
     }
 
-    std::cout << "OpenGL version " << glGetString(GL_VERSION) << std::endl;
+    cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
 
     glfwSwapInterval(1);
 
@@ -79,25 +101,15 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // Simple vertex shader.
-    const char *vert_shader_src =
-            "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-            "}\0";
+    string vert_string = loadShaderSource("../src/shader/vertex.glsl");
+    const char* vert_shader_src = vert_string.c_str();
     unsigned int vert_shader_id = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vert_shader_id, 1, &vert_shader_src, NULL);
     glCompileShader(vert_shader_id);
 
     // Simple fragment shader.
-    const char *frag_shader_src =
-            "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "void main()\n"
-            "{\n"
-            "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-            "}\0";
+    string frag_string = loadShaderSource("../src/shader/fragment.glsl");
+    const char* frag_shader_src = frag_string.c_str();
     unsigned int frag_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(frag_shader_id, 1, &frag_shader_src, NULL);
     glCompileShader(frag_shader_id);
@@ -110,13 +122,13 @@ int main()
         glGetShaderiv(vert_shader_id, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(vert_shader_id, 512, NULL, info_log);
-            std::cout << "Vertex shader compilation failed: \n" << info_log << std::endl;
+            cout << "Vertex shader compilation failed: \n" << info_log << endl;
         }
 
         glGetShaderiv(frag_shader_id, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(frag_shader_id, 512, NULL, info_log);
-            std::cout << "Fragment shader compilation failed: \n" << info_log << std::endl;
+            cout << "Fragment shader compilation failed: \n" << info_log << endl;
         }
     }
 
@@ -133,7 +145,7 @@ int main()
         glGetProgramiv(shader_program_id, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader_program_id, 512, NULL, info_log);
-            std::cout << "Shader program linking failed: \n" << info_log << std::endl;
+            cout << "Shader program linking failed: \n" << info_log << endl;
 
         }
     }
@@ -170,7 +182,7 @@ int main()
         glfwPollEvents();
 
         tock = glfwGetTime();
-        //std::cout << "Time per frame: " << 1000.0 * (tock - tick) << std::endl;
+        //cout << "Time per frame: " << 1000.0 * (tock - tick) << endl;
         tick = tock;
     }
 
