@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -74,9 +75,10 @@ int main()
 
     // Define triangle vertices.
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        // Positions        // Colors
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -91,9 +93,13 @@ int main()
     unsigned int vbo_id;
     glGenBuffers(1, &vbo_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), vertices, GL_STATIC_DRAW);
+    // Specify vertex positions, on layout index 0.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // Specify vertex colors, on layout 1.
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     // Populate VAO with Elemento Buffer Object.
     unsigned int ebo_id;
     glGenBuffers(1, &ebo_id);
@@ -173,8 +179,12 @@ int main()
         glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Draw calls.
+        // Set vertex color via uniform.
+        float green = sin(tick) / 2.0f + 0.5f;
+        int color_uniform_location = glGetUniformLocation(shader_program_id, "input_color");
         glUseProgram(shader_program_id);
+        // Update uniform value.
+        glUniform4f(color_uniform_location, 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(vao_id);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 
