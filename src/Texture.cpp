@@ -30,10 +30,21 @@ Texture::Texture(const std::string& filename):
         buffer_ = data;
     }
 
+    // Determine the correct texture format.
+    GLenum format;
+    if (channels_ == 1)
+        format = GL_RED;
+    else if (channels_ == 2)
+        format = GL_RG;
+    else if (channels_ == 3)
+        format = GL_RGB;
+    else // channels_ == 4
+        format = GL_RGBA;
+
     // Create texture.
     glGenTextures(1, &id_);
     glBindTexture(GL_TEXTURE_2D, id_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width_, height_, 0, format, GL_UNSIGNED_BYTE, buffer_);
 
     // Set texture parameters. These four parameters MUST BE SET, or else we get a black texture.
     // For setting parameters per texture object, use `glTextureParameter__` functions.

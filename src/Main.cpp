@@ -101,11 +101,6 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Create texture.
-    float tex_buffer[] = {
-        0.0f, 0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f
-    };
-
     Texture texture("../assets/wall.jpg");
 
     double tick = glfwGetTime(), tock;
