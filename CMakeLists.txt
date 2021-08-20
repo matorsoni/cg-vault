@@ -9,7 +9,7 @@ add_subdirectory(deps/glfw)
 add_executable(
     demo
     deps/glad/src/glad.c
-    src/main.cpp
+    src/Main.cpp
     src/ShaderProgram.cpp
 )
 

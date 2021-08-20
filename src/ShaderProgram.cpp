@@ -18,8 +18,7 @@ static string loadShaderSource(const string& filename)
     }
 
     while (getline(file, line)) {
-        text.append(line);
-        text.append("\n");
+        text.append(line + "\n");
     }
 
     return text;

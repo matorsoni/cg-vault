@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-#include <string>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -33,8 +32,8 @@ int main()
         return -1;
     }
 
-    const int window_width = 640;
-    const int window_height = 480;
+    const int window_width = 960;
+    const int window_height = 720;
     // Set minimum OpenGL version expected by the context.
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -94,6 +93,13 @@ int main()
 
     // Render in wireframe mode.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // Global texture options.
+    // For setting parameters per texture object, use `glTextureParameter__` functions.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
