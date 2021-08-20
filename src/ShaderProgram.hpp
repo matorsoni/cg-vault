@@ -19,6 +19,7 @@ public:
     void use() const;
 
     // Uniform setters.
+    void setUniform1i(const char* uniform_name, int value) const;
     void setUniform4f(const char* uniform_name, float x, float y, float z, float w) const;
 };
 

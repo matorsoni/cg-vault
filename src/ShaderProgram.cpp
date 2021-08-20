@@ -94,6 +94,17 @@ void ShaderProgram::use() const
     glUseProgram(id_);
 }
 
+void ShaderProgram::setUniform1i(const char* uniform_name, int value) const
+{
+    int uniform_location = glGetUniformLocation(id_, uniform_name);
+    if (uniform_location == -1) {
+        cout << "Unable to locate uniform " << uniform_name << endl;
+        return;
+    }
+
+    glUniform1i(uniform_location, value);
+}
+
 void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, float z, float w) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);

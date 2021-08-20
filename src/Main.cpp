@@ -57,10 +57,10 @@ int main()
 
     // Define triangle vertices.
     float vertices[] = {
-        // Positions        // Colors
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+        // Positions          // Colors           // Tex coords
+        -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.5f, 1.0f
     };
 
     unsigned int indices[] = {
@@ -75,13 +75,16 @@ int main()
     unsigned int vbo_id;
     glGenBuffers(1, &vbo_id);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), vertices, GL_STATIC_DRAW);
-    // Specify vertex positions, on layout index 0.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), vertices, GL_STATIC_DRAW);
+    // Specify vertex positions, on layout location 0.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Specify vertex colors, on layout 1.
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Specify vertex colors, on layout location 1.
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // Specify vertex texture coords, on layout location 2.
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     // Populate VAO with Elemento Buffer Object.
     unsigned int ebo_id;
     glGenBuffers(1, &ebo_id);
@@ -94,12 +97,25 @@ int main()
     // Render in wireframe mode.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Global texture options.
+    // Create texture.
+    float tex_buffer[] = {
+        0.0f, 0.0f, 0.0f,  1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,  0.0f, 0.0f, 0.0f
+    };
+    unsigned int tex_id;
+    glGenTextures(1, &tex_id);
+    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGB, GL_FLOAT, tex_buffer);
+    // Set texture parameters. These four parameters MUST BE SET, or else we get a black texture.
     // For setting parameters per texture object, use `glTextureParameter__` functions.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // Generate texture mipmap.
+    glGenerateMipmap(GL_TEXTURE_2D);
+    // Unbind texture.
+    glBindTexture(GL_TEXTURE_2D, tex_id);
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
@@ -119,8 +135,11 @@ int main()
 
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex_id);
         shader_program.use();
-        // Update uniform value.
+        // Update uniform values.
+        shader_program.setUniform1i("input_tex", 0);
         shader_program.setUniform4f("input_color", 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(vao_id);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
