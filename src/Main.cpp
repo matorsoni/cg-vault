@@ -101,7 +101,8 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Create texture.
-    Texture texture("../assets/wall.jpg");
+    Texture texture0("../assets/wall.jpg");
+    Texture texture1("../assets/awesomeface.png");
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
@@ -122,11 +123,13 @@ int main()
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
         // Bind texture.
-        texture.bind(0);
+        texture0.bind(0);
+        texture1.bind(1);
         shader_program.use();
         // Update uniform values.
-        shader_program.setUniform1i("input_tex", 0);
-        shader_program.setUniform4f("input_color", 0.0f, green, 0.0f, 1.0f);
+        shader_program.setUniform1i("u_sampler0", 0);
+        shader_program.setUniform1i("u_sampler1", 1);
+        shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         glBindVertexArray(vao_id);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
