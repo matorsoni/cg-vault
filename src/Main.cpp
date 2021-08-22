@@ -164,20 +164,28 @@ int main()
         float green = sin(tick) / 2.0f + 0.5f;
 
         // Create matrix transformation.
-        mat4 transf = getScale(1.5f, 0.5f, 2.0f);
+        mat4 transf(1.0);
+        transf = getScale(1.5f, 0.5f, 2.0f) * transf;
         transf = getRotationZ(100 * tick) * transf;
         transf = getTranslation(vec3(0.5, -0.5, 0)) * transf;
 
         // Bind texture.
         texture0.bind(0);
         texture1.bind(1);
-        shader_program.use();
+
         // Update uniform values.
+        shader_program.use();
         shader_program.setUniform1i("u_sampler0", 0);
         shader_program.setUniform1i("u_sampler1", 1);
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(vao_id);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        // Draw second box.
+        transf = mat4(1.0);
+        transf = getScale(sin(tick), 1/tick, 2.0f) * transf;
+        shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
