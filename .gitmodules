@@ -7,3 +7,6 @@
 [submodule "deps/stb"]
 	path = deps/stb
 	url = git@github.com:nothings/stb.git
+[submodule "deps/glm"]
+	path = deps/glm
+	url = https://github.com/g-truc/glm.git

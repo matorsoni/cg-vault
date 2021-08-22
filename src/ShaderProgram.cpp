@@ -116,3 +116,14 @@ void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, flo
 
     glUniform4f(uniform_location, x, y, z, w);
 }
+
+void ShaderProgram::setUniformMat4f(const char* uniform_name, float* data)
+{
+    int uniform_location = glGetUniformLocation(id_, uniform_name);
+    if (uniform_location == -1) {
+        cout << "Unable to locate uniform " << uniform_name << endl;
+        return;
+    }
+
+    glUniformMatrix4fv(uniform_location, 1, GL_FALSE, data);
+}

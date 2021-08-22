@@ -17,8 +17,9 @@ add_executable(
 target_include_directories(
     demo
     PRIVATE
-        deps/glfw/include
         deps/glad/include
+        deps/glfw/include
+        deps/glm
         deps/stb
 )
 

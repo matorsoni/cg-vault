@@ -8,9 +8,11 @@ layout (location = 2) in vec2 in_tex;
 out vec4 v_color;
 out vec2 v_tex;
 
+uniform mat4 u_mat;
+
 void main()
 {
-   gl_Position = vec4(in_pos, 1.0);
+   gl_Position = u_mat * vec4(in_pos, 1.0);
    v_color = vec4(in_color, 1.0);
    v_tex = in_tex;
 }

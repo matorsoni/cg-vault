@@ -4,11 +4,16 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
 
 using namespace std;
+using glm::mat4;
+using glm::vec3;
+using glm::vec4;
 
 // GLFW error calback.
 static void error_callback(int error, const char* description)
@@ -21,6 +26,41 @@ static void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+// Create rotation matrix.
+static mat4 getRotationZ(float angle)
+{
+    float s = glm::sin(glm::radians(angle));
+    float c = glm::cos(glm::radians(angle));
+    // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
+    return mat4(
+        c, s, 0, 0,
+       -s, c, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    );
+}
+
+// Create scaling matrix.
+static mat4 getScale(float a, float b, float c)
+{
+    return mat4(
+        a, 0, 0, 0,
+        0, b, 0, 0,
+        0, 0, c, 0,
+        0, 0, 0, 1
+    );
+}
+
+// Create translation matrix.
+static mat4 getTranslation(vec3 u)
+{
+    // Initialize as identity.
+    mat4 trans(1.0);
+    // Set the fourth column to be the translation vector.
+    trans[3] = vec4(u, 1.0);
+    return trans;
 }
 
 // Main function.
@@ -122,6 +162,12 @@ int main()
 
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
+
+        // Create matrix transformation.
+        mat4 transf = getScale(1.5f, 0.5f, 2.0f);
+        transf = getRotationZ(100 * tick) * transf;
+        transf = getTranslation(vec3(0.5, -0.5, 0)) * transf;
+
         // Bind texture.
         texture0.bind(0);
         texture1.bind(1);
@@ -130,6 +176,7 @@ int main()
         shader_program.setUniform1i("u_sampler0", 0);
         shader_program.setUniform1i("u_sampler1", 1);
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
+        shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(vao_id);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
