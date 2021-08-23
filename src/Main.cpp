@@ -169,6 +169,21 @@ int main()
     Texture texture0("../assets/wall.jpg");
     Texture texture1("../assets/awesomeface.png");
 
+    // Render more cubes.
+    vec3 cube_positions[10] = {
+        vec3(0.0f, 0.0f, -10.0f),
+        vec3(1.0f, 1.0f, -1.0f),
+        vec3(2.0f, 0.0f, -2.0f),
+        vec3(-2.0f, -2.0f, -4.0f),
+        vec3(1.0f, -1.0f, -4.0f),
+        vec3(-4.0f, -3.0f, -8.0f),
+        vec3(-3.0f, 0.0f, -4.0f),
+        vec3(3.0f, -3.0f, -10.0f),
+        vec3(2.0f, 0.0f, -4.0f),
+        vec3(0.0f, 0.0f, -4.0f)
+    };
+
+
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
@@ -190,16 +205,12 @@ int main()
         // Set vertex color via uniform.
         float green = sin(tick) / 2.0f + 0.5f;
 
-        // Create model (local -> world) matrix transformation.
-        mat4 model(1.0);
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, float(tick) * glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
         // Create camera view matrix transform.
         mat4 view = getTranslation(vec3(0.0f, 0.0f, -3.0f));
         // Create projection matrix.
         mat4 proj = glm::perspective(glm::radians(45.0f), aspect_ratio, 0.1f, 100.0f);
         // Final transformation.
-        mat4 transf = proj * view * model;
+        mat4 transf = proj * view;
 
         // Bind texture.
         texture0.bind(0);
@@ -212,7 +223,15 @@ int main()
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(vao_id);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < 10; ++i) {
+            // Create model (local -> world) matrix transformation.
+            mat4 model = getTranslation(cube_positions[i]);
+            model = glm::rotate(model, glm::radians(18.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, float(tick) * glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+            shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
