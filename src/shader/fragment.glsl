@@ -1,6 +1,5 @@
 #version 330 core
 
-in vec4 v_color;
 in vec2 v_tex;
 
 // Output of fragment shader.
@@ -12,5 +11,5 @@ uniform sampler2D u_sampler1;
 
 void main()
 {
-    f_color = mix(texture(u_sampler0, v_tex), texture(u_sampler1, v_tex), 0.5) * (v_color + u_color);
+    f_color = mix(texture(u_sampler0, v_tex), texture(u_sampler1, v_tex), 0.5) + 0.2 * u_color;
 }
