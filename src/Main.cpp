@@ -78,6 +78,7 @@ int main()
     // Set minimum OpenGL version expected by the context.
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Demo", NULL, NULL);
     if (!window) {
         cout << "Failed to create window." << endl;
@@ -94,8 +95,11 @@ int main()
 
     cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
 
+    // Set OpenGL constant states.
     glfwSwapInterval(1);
     glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, window_width, window_height);
+    const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
     // Define triangle vertices.
     float vertices[] = {
@@ -187,16 +191,6 @@ int main()
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
-        // Get frame buffer size and set OpenGL viewport dimensions.
-        // Should normally be the same size as the window.
-        float aspect_ratio;
-        {
-            int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
-            glViewport(0, 0, width, height);
-            aspect_ratio = static_cast<float>(width) / height;
-        }
-
         processInput(window);
 
         glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
