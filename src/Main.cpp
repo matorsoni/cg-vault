@@ -66,6 +66,29 @@ static mat4 getTranslation(vec3 u)
     return trans;
 }
 
+// Create View transform.
+static mat4 viewMatrix(const vec3& camera_pos, const vec3& up, const vec3& target)
+{
+    // View matrix is the inverse of:
+    // | .  | .  | .  | .  | -1          | .  | Ex | .  | 0  |     | 1  | 0  | 0  | .  |
+    // | Ex | Ey | Ez | P  |      =      | .  | Ey | .  | 0  |  *  | 0  | 1  | 0  | -P |
+    // | .  | .  | .  | .  |             | .  | Ez | .  | 0  |     | 0  | 0  | 1  | .  |
+    // | 0  | 0  | 0  | 1  |             | 0  | 0  | 0  | 1  |     | 0  | 0  | 0  | 1  |
+    // Ex, Ey and Ex being the X, Y, Z unit vectors of the camera's frame.
+
+    vec3 Ez = glm::normalize(camera_pos - target);
+    vec3 Ex = glm::normalize(glm::cross(up, Ez));
+    vec3 Ey = glm::cross(Ez, Ex);
+
+    mat4 inv_rotation = glm::transpose(
+        mat4{vec4(Ex, 0.0f), vec4(Ey, 0.0f), vec4(Ez, 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f)}
+    );
+    mat4 inv_translation = mat4(1.0f);
+    inv_translation[3] = vec4(-camera_pos, 1.0f);
+
+    return inv_rotation * inv_translation;
+}
+
 // Main function.
 int main()
 {
@@ -177,6 +200,10 @@ int main()
         vec3(0.0f, 0.0f, -4.0f)
     };
 
+    // Y as the up direction.
+    const vec3 up{0.0f, 1.0f, 0.0f};
+    vec3 camera_pos{0.0f, 1.0f, 1.0f};
+    vec3 target{0.0f};
 
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
@@ -190,7 +217,8 @@ int main()
         float green = sin(tick) / 2.0f + 0.5f;
 
         // Create camera view matrix transform.
-        mat4 view = getTranslation(vec3(0.0f, 0.0f, -3.0f));
+        camera_pos.z += 0.05;
+        mat4 view = viewMatrix(camera_pos, up, target);
         // Create projection matrix.
         mat4 proj = glm::perspective(glm::radians(45.0f), aspect_ratio, 0.1f, 100.0f);
         // Final transformation.
