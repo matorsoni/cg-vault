@@ -20,16 +20,17 @@ Mesh::Mesh(const vector<Vertex>& p_vertices,
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
     // Specify vertex positions, on layout location 0.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Specify vertex texture coords, on layout location 2.
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Specify vertex normals, on layout location 1.
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)3);
     glEnableVertexAttribArray(1);
+    // Specify vertex texture coords, on layout location 2.
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // Setup Element Buffer Object if there are indices.
     if (p_indices.size() != 0) {
-        assert(p_vertices.size() == p_indices.size());
-
         // Copy indices to the mesh object.
         indices.reserve(p_indices.size());
         for (const auto& ind : p_indices)
@@ -40,7 +41,7 @@ Mesh::Mesh(const vector<Vertex>& p_vertices,
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                      indices.size() * sizeof(unsigned int),
-                     &indices[0], GL_STATIC_DRAW);
+                     indices.data(), GL_STATIC_DRAW);
     }
 
     // Unbind VAO.
