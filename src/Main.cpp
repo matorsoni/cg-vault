@@ -5,9 +5,9 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Math.hpp"
 #include "Mesh.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
@@ -31,63 +31,6 @@ static void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
-// Create rotation matrix.
-static mat4 getRotationZ(float angle)
-{
-    float s = glm::sin(glm::radians(angle));
-    float c = glm::cos(glm::radians(angle));
-    // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
-    return mat4(
-        c, s, 0, 0,
-       -s, c, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    );
-}
-
-// Create scaling matrix.
-static mat4 getScale(float a, float b, float c)
-{
-    return mat4(
-        a, 0, 0, 0,
-        0, b, 0, 0,
-        0, 0, c, 0,
-        0, 0, 0, 1
-    );
-}
-
-// Create translation matrix.
-static mat4 getTranslation(vec3 u)
-{
-    // Initialize as identity.
-    mat4 trans(1.0);
-    // Set the fourth column to be the translation vector.
-    trans[3] = vec4(u, 1.0);
-    return trans;
-}
-
-// Create View transform.
-static mat4 viewMatrix(const vec3& camera_pos, const vec3& up, const vec3& target)
-{
-    // View matrix is the inverse of:
-    // | .  | .  | .  | .  | -1          | .  | Ex | .  | 0  |     | 1  | 0  | 0  | .  |
-    // | Ex | Ey | Ez | P  |      =      | .  | Ey | .  | 0  |  *  | 0  | 1  | 0  | -P |
-    // | .  | .  | .  | .  |             | .  | Ez | .  | 0  |     | 0  | 0  | 1  | .  |
-    // | 0  | 0  | 0  | 1  |             | 0  | 0  | 0  | 1  |     | 0  | 0  | 0  | 1  |
-    // Ex, Ey and Ex being the X, Y, Z unit vectors of the camera's frame.
-
-    vec3 Ez = glm::normalize(camera_pos - target);
-    vec3 Ex = glm::normalize(glm::cross(up, Ez));
-    vec3 Ey = glm::cross(Ez, Ex);
-
-    mat4 inv_rotation = glm::transpose(
-        mat4{vec4(Ex, 0.0f), vec4(Ey, 0.0f), vec4(Ez, 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f)}
-    );
-    mat4 inv_translation = mat4(1.0f);
-    inv_translation[3] = vec4(-camera_pos, 1.0f);
-
-    return inv_rotation * inv_translation;
-}
 
 // Main function.
 int main()
@@ -218,7 +161,7 @@ int main()
 
         // Create camera view matrix transform.
         camera_pos.z += 0.05;
-        mat4 view = viewMatrix(camera_pos, up, target);
+        mat4 view = getView(camera_pos, up, target);
         // Create projection matrix.
         mat4 proj = glm::perspective(glm::radians(45.0f), aspect_ratio, 0.1f, 100.0f);
         // Final transformation.
