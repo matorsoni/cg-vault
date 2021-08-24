@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -7,11 +8,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Mesh.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
 
 using namespace std;
 using glm::mat4;
+using glm::vec2;
 using glm::vec3;
 using glm::vec4;
 
@@ -101,67 +104,54 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    // Define triangle vertices.
-    float vertices[] = {
+    // Define cube vertices.
+    vector<Vertex> cube_vertices = {
         // Position           // Texture
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 0.0f)},
+        {vec3( 0.5f, -0.5f, -0.5f), vec2(1.0f, 0.0f)},
+        {vec3( 0.5f,  0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3( 0.5f,  0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3(-0.5f,  0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 0.0f)},
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        {vec3(-0.5f, -0.5f,  0.5f), vec2(0.0f, 0.0f)},
+        {vec3( 0.5f, -0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 1.0f)},
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 1.0f)},
+        {vec3(-0.5f,  0.5f,  0.5f), vec2(0.0f, 1.0f)},
+        {vec3(-0.5f, -0.5f,  0.5f), vec2(0.0f, 0.0f)},
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        {vec3(-0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3(-0.5f,  0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3(-0.5f, -0.5f,  0.5f), vec2(0.0f, 0.0f)},
+        {vec3(-0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
 
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3( 0.5f,  0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3( 0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3( 0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3( 0.5f, -0.5f,  0.5f), vec2(0.0f, 0.0f)},
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3( 0.5f, -0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3( 0.5f, -0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3( 0.5f, -0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3(-0.5f, -0.5f,  0.5f), vec2(0.0f, 0.0f)},
+        {vec3(-0.5f, -0.5f, -0.5f), vec2(0.0f, 1.0f)},
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        {vec3(-0.5f,  0.5f, -0.5f), vec2(0.0f, 1.0f)},
+        {vec3( 0.5f,  0.5f, -0.5f), vec2(1.0f, 1.0f)},
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3( 0.5f,  0.5f,  0.5f), vec2(1.0f, 0.0f)},
+        {vec3(-0.5f,  0.5f,  0.5f), vec2(0.0f, 0.0f)},
+        {vec3(-0.5f,  0.5f, -0.5f), vec2(0.0f, 1.0f)}
     };
 
-    // Create Vertex Array Object.
-    unsigned int vao_id;
-    glGenVertexArrays(1, &vao_id);
-    glBindVertexArray(vao_id);
-    // Populate VAO with a Vertex Buffer Object.
-    unsigned int vbo_id;
-    glGenBuffers(1, &vbo_id);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // Specify vertex positions, on layout location 0.
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // Specify vertex texture coords, on layout location 2.
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    // Create Mesh.
+    Mesh cube(cube_vertices, {});
 
     // Load shader program.
     ShaderProgram shader_program("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
@@ -216,7 +206,7 @@ int main()
         shader_program.setUniform1i("u_sampler1", 1);
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
-        glBindVertexArray(vao_id);
+        glBindVertexArray(cube.vao);
         for (int i = 0; i < 10; ++i) {
             // Create model (local -> world) matrix transformation.
             mat4 model = getTranslation(cube_positions[i]);
@@ -224,7 +214,7 @@ int main()
             model = glm::rotate(model, float(tick) * glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
             shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            cube.draw();
         }
 
         glfwSwapBuffers(window);

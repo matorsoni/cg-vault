@@ -10,6 +10,7 @@ add_executable(
     demo
     deps/glad/src/glad.c
     src/Main.cpp
+    src/Mesh.cpp
     src/ShaderProgram.cpp
     src/Texture.cpp
 )
