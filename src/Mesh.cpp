@@ -54,6 +54,6 @@ void Mesh::draw()
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
     else {
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_BYTE, (void*)0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
     }
 }
