@@ -140,9 +140,10 @@ int main()
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(cube.vao);
+        mat4 model(1.0f);
         for (int i = 0; i < 10; ++i) {
             // Create model (local -> world) matrix transformation.
-            mat4 model = getTranslation(cube_positions[i]);
+            model = getTranslation(cube_positions[i]);
             model = glm::rotate(model, glm::radians(18.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
             model = glm::rotate(model, float(tick) * glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
             shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
@@ -150,6 +151,8 @@ int main()
             cube.draw();
         }
 
+        model = mat4(1.0f);
+        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(square.vao);
         square.draw();
 
