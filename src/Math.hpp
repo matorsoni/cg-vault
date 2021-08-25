@@ -7,7 +7,7 @@
 glm::mat4 getRotationZ(float angle);
 
 // Create scaling matrix.
-glm::mat4 getScale(float a, float b, float c);
+glm::mat4 getScale(const glm::vec3& u);
 
 // Create translation matrix.
 glm::mat4 getTranslation(const glm::vec3& u);

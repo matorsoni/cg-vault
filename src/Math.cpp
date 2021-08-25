@@ -17,12 +17,12 @@ mat4 getRotationZ(float angle)
 }
 
 
-mat4 getScale(float a, float b, float c)
+mat4 getScale(const vec3& u)
 {
     return mat4(
-        a, 0, 0, 0,
-        0, b, 0, 0,
-        0, 0, c, 0,
+        u.x, 0, 0, 0,
+        0, u.y, 0, 0,
+        0, 0, u.z, 0,
         0, 0, 0, 1
     );
 }

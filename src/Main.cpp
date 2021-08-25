@@ -91,25 +91,30 @@ int main()
     Texture texture0("../assets/wall.jpg");
     Texture texture1("../assets/awesomeface.png");
 
-    // Render more cubes.
-    vec3 cube_positions[10] = {
-        vec3(0.0f, 0.0f, -10.0f),
-        vec3(1.0f, 1.0f, -1.0f),
-        vec3(2.0f, 0.0f, -2.0f),
-        vec3(-2.0f, -2.0f, -4.0f),
-        vec3(1.0f, -1.0f, -4.0f),
-        vec3(-4.0f, -3.0f, -8.0f),
-        vec3(-3.0f, 0.0f, -4.0f),
-        vec3(3.0f, -3.0f, -10.0f),
-        vec3(2.0f, 0.0f, -4.0f),
-        vec3(0.0f, 0.0f, -4.0f)
-    };
-
-    // Y as the up direction.
+    // Setup camera with Y as the up direction.
     const vec3 up{0.0f, 1.0f, 0.0f};
-    vec3 camera_pos{0.0f, 1.0f, 1.0f};
+    vec3 camera_pos{3.0f, 4.0f, 3.0f};
     vec3 target{0.0f};
 
+    /*** Setup the table scene. ***/
+    // Table variables.
+    const float table_width = 2.0f;
+    const float table_depth = 0.75f;
+    const float table_height = 1.0f;
+    const float leg_width = 0.1f;
+    const float top_girth = 0.1f;
+    const float top_scale_factor = 1.1f;
+    const vec3 leg_scale = vec3(leg_width, table_height, leg_width);
+    vec3 leg_position[] = {
+        vec3(table_depth/2, table_height/2, table_width/2),
+        vec3(table_depth/2, table_height/2, -table_width/2),
+        vec3(-table_depth/2, table_height/2, -table_width/2),
+        vec3(-table_depth/2, table_height/2, table_width/2)
+    };
+    const vec3 top_scale = vec3(top_scale_factor * table_depth, top_girth, top_scale_factor * table_width);
+    const vec3 top_position = vec3(0.0f, table_height + top_girth/2, 0.0f);
+
+    // Main loop.
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
@@ -122,7 +127,6 @@ int main()
         float green = sin(tick) / 2.0f + 0.5f;
 
         // Create camera view matrix transform.
-        camera_pos.z += 0.05;
         mat4 view = getView(camera_pos, up, target);
         // Create projection matrix.
         mat4 proj = glm::perspective(glm::radians(45.0f), aspect_ratio, 0.1f, 100.0f);
@@ -131,30 +135,37 @@ int main()
 
         // Bind texture.
         texture0.bind(0);
-        texture1.bind(1);
 
-        // Update uniform values.
+        // Draw table.
         shader_program.use();
         shader_program.setUniform1i("u_sampler0", 0);
         shader_program.setUniform1i("u_sampler1", 1);
         shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
         shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
-        glBindVertexArray(cube.vao);
         mat4 model(1.0f);
-        for (int i = 0; i < 10; ++i) {
+        glBindVertexArray(cube.vao);
+        // Draw table top.
+        model = getScale(top_scale);
+        model = getTranslation(top_position) * model;
+        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+        cube.draw();
+        // Draw legs.
+        for (int i = 0; i < 4; ++i) {
             // Create model (local -> world) matrix transformation.
-            model = getTranslation(cube_positions[i]);
-            model = glm::rotate(model, glm::radians(18.0f * i), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, float(tick) * glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+            model = getScale(leg_scale);
+            model = getTranslation(leg_position[i]) * model;
             shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
 
             cube.draw();
         }
 
-        model = mat4(1.0f);
+        model = getScale(vec3(5.0f, 0.0f, 5.0f));
+        texture0.unbind();
+        texture1.bind(1);
         shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(square.vao);
         square.draw();
+        texture1.unbind();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
