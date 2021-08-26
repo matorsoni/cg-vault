@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 
 // Create rotation matrix.
+glm::mat4 getRotationX(float angle);
+glm::mat4 getRotationY(float angle);
 glm::mat4 getRotationZ(float angle);
 
 // Create scaling matrix.

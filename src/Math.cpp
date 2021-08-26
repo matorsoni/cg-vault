@@ -3,6 +3,32 @@
 using namespace glm;
 
 
+mat4 getRotationX(float angle)
+{
+    float s = sin(radians(angle));
+    float c = cos(radians(angle));
+    // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
+    return mat4(
+        1, 0, 0, 0,
+        0, c, s, 0,
+        0, -s, c, 0,
+        0, 0, 0, 1
+    );
+}
+
+mat4 getRotationY(float angle)
+{
+    float s = sin(radians(angle));
+    float c = cos(radians(angle));
+    // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
+    return mat4(
+        c, 0, -s, 0,
+        0, 1, 0, 0,
+        s, 0, c, 0,
+        0, 0, 0, 1
+    );
+}
+
 mat4 getRotationZ(float angle)
 {
     float s = sin(radians(angle));

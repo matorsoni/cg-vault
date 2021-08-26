@@ -6,5 +6,5 @@ out vec4 f_color;
 
 void main()
 {
-    f_color = vec4(v_normal, 1.0f);
+    f_color = vec4(v_normal * 0.5f + 0.5f, 1.0f);
 }

@@ -172,9 +172,11 @@ int main()
         texture0.unbind();
 
         // Draw icosahedron.
-        model = getTranslation(ico_position);
-        shader_texture.use();
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        model = getRotationY(10 * tick);
+        model = getTranslation(ico_position) * model;
+        shader_normal.use();
+        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(icosahedron.vao);
         icosahedron.draw();
 
