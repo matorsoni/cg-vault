@@ -45,8 +45,8 @@ int main()
     const int window_width = 960;
     const int window_height = 720;
     // Set minimum OpenGL version expected by the context.
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Demo", NULL, NULL);
     if (!window) {
@@ -83,7 +83,7 @@ int main()
 
     // Load shader program.
     ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
-    ShaderProgram shader_normal("../src/shader/vertex.glsl", "../src/shader/VertexColor.frag");
+    ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert", "../src/shader/VertexColor.frag");
 
     // Render in wireframe mode.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -118,11 +118,11 @@ int main()
     vector<unsigned int> ico_indices;
     createIcosahedron(ico_vertices, ico_indices);
     Mesh icosahedron(ico_vertices, ico_indices);
-    vec3 ico_position{2.0f, 1.0f, 0.0f};
+    vec3 ico_position{0.0f, table_top_y + 1.f, 0.0f};
 
     // Setup camera with Y as the up direction.
     const vec3 up{0.0f, 1.0f, 0.0f};
-    vec3 camera_pos{3.0f, 4.0f, 3.0f};
+    vec3 camera_pos{3.0f, 2.0f, 3.0f};
     vec3 target{0.0f, table_top_y, 0.0f};
 
     // Main loop.
@@ -172,7 +172,8 @@ int main()
         texture0.unbind();
 
         // Draw icosahedron.
-        model = getRotationY(10 * tick);
+        model = getScale(vec3(0.5f));
+        model = getRotationY(50 * tick) * model;
         model = getTranslation(ico_position) * model;
         shader_normal.use();
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));

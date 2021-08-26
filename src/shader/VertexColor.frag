@@ -1,10 +1,10 @@
-#version 330 core
+#version 400 core
 
-in vec3 v_normal;
+in vec4 v_color;
 
 out vec4 f_color;
 
 void main()
 {
-    f_color = vec4(v_normal * 0.5f + 0.5f, 1.0f);
+    f_color = v_color;
 }
