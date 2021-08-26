@@ -2,7 +2,6 @@
 
 in vec2 v_tex;
 
-// Output of fragment shader.
 out vec4 f_color;
 
 uniform vec4 u_color;

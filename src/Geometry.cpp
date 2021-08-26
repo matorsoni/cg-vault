@@ -104,7 +104,7 @@ void createIcosahedron(std::vector<Vertex>& vertices, std::vector<unsigned int>&
     const float d_theta = 2*PI/5;
 
     // Add top vertice.
-    vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f));
+    vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     // Add the 5 vertices below the first one.
     for (float theta = 0.0f; theta < 2*PI - 0.01f; theta += d_theta) {
@@ -123,7 +123,7 @@ void createIcosahedron(std::vector<Vertex>& vertices, std::vector<unsigned int>&
     }
 
     // Add last vertice.
-    vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f));
+    vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f));
 
     // Define triangles.
     indices = {

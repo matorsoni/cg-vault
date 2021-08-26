@@ -82,7 +82,8 @@ int main()
     Mesh square(square_vertices, square_indices);
 
     // Load shader program.
-    ShaderProgram shader_program("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
+    ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
+    ShaderProgram shader_normal("../src/shader/vertex.glsl", "../src/shader/VertexColor.frag");
 
     // Render in wireframe mode.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -147,24 +148,24 @@ int main()
         texture0.bind(0);
 
         // Draw table.
-        shader_program.use();
-        shader_program.setUniform1i("u_sampler0", 0);
-        shader_program.setUniform1i("u_sampler1", 1);
-        shader_program.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
-        shader_program.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_texture.use();
+        shader_texture.setUniform1i("u_sampler0", 0);
+        shader_texture.setUniform1i("u_sampler1", 1);
+        shader_texture.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
         mat4 model(1.0f);
         glBindVertexArray(cube.vao);
         // Draw table top.
         model = getScale(top_scale);
         model = getTranslation(top_position) * model;
-        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         cube.draw();
         // Draw legs.
         for (int i = 0; i < 4; ++i) {
             // Create model (local -> world) matrix transformation.
             model = getScale(leg_scale);
             model = getTranslation(leg_position[i]) * model;
-            shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
 
             cube.draw();
         }
@@ -172,16 +173,16 @@ int main()
 
         // Draw icosahedron.
         model = getTranslation(ico_position);
-        texture0.bind(0);
-        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.use();
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(icosahedron.vao);
         icosahedron.draw();
-        texture0.unbind();
 
         // Draw floor.
         model = getScale(vec3(5.0f, 0.0f, 5.0f));
         texture1.bind(1);
-        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.use();
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(square.vao);
         square.draw();
         texture1.unbind();
