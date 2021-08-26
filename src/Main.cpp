@@ -88,13 +88,8 @@ int main()
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Create texture.
-    Texture texture0("../assets/wall.jpg");
-    Texture texture1("../assets/awesomeface.png");
-
-    // Setup camera with Y as the up direction.
-    const vec3 up{0.0f, 1.0f, 0.0f};
-    vec3 camera_pos{3.0f, 4.0f, 3.0f};
-    vec3 target{0.0f};
+    Texture texture0("../assets/wood3.jpeg");
+    Texture texture1("../assets/wood1.jpeg");
 
     /*** Setup the table scene. ***/
     // Table variables.
@@ -111,8 +106,23 @@ int main()
         vec3(-table_depth/2, table_height/2, -table_width/2),
         vec3(-table_depth/2, table_height/2, table_width/2)
     };
-    const vec3 top_scale = vec3(top_scale_factor * table_depth, top_girth, top_scale_factor * table_width);
+    const vec3 top_scale = vec3(top_scale_factor * table_depth,
+                                top_girth,
+                                top_scale_factor * table_width);
     const vec3 top_position = vec3(0.0f, table_height + top_girth/2, 0.0f);
+    const float table_top_y = table_height + top_girth;
+
+    // Icosahedron.
+    vector<Vertex> ico_vertices;
+    vector<unsigned int> ico_indices;
+    createIcosahedron(ico_vertices, ico_indices);
+    Mesh icosahedron(ico_vertices, ico_indices);
+    vec3 ico_position{2.0f, 1.0f, 0.0f};
+
+    // Setup camera with Y as the up direction.
+    const vec3 up{0.0f, 1.0f, 0.0f};
+    vec3 camera_pos{3.0f, 4.0f, 3.0f};
+    vec3 target{0.0f, table_top_y, 0.0f};
 
     // Main loop.
     double tick = glfwGetTime(), tock;
@@ -158,9 +168,18 @@ int main()
 
             cube.draw();
         }
-
-        model = getScale(vec3(5.0f, 0.0f, 5.0f));
         texture0.unbind();
+
+        // Draw icosahedron.
+        model = getTranslation(ico_position);
+        texture0.bind(0);
+        shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
+        glBindVertexArray(icosahedron.vao);
+        icosahedron.draw();
+        texture0.unbind();
+
+        // Draw floor.
+        model = getScale(vec3(5.0f, 0.0f, 5.0f));
         texture1.bind(1);
         shader_program.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(square.vao);
