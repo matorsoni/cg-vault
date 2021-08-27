@@ -42,6 +42,15 @@ mat4 getRotationZ(float angle)
     );
 }
 
+mat4 getRotation(const glm::vec3& ori_x,
+                 const glm::vec3& ori_y,
+                 const glm::vec3& ori_z)
+{
+    return mat4(vec4(glm::normalize(ori_x), 0.0f),
+                vec4(glm::normalize(ori_y), 0.0f),
+                vec4(glm::normalize(ori_z), 0.0f),
+                vec4(0.0f, 0.0f, 0.0f, 1.0f));
+}
 
 mat4 getScale(const vec3& u)
 {

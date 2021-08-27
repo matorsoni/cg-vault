@@ -12,7 +12,7 @@ out vec2 v_tex;
 
 vec3 color_from_normal(vec3 normal)
 {
-   return normalize(normal);
+   return normalize(abs(normal));
 }
 
 void main()

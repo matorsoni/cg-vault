@@ -7,7 +7,9 @@
 glm::mat4 getRotationX(float angle);
 glm::mat4 getRotationY(float angle);
 glm::mat4 getRotationZ(float angle);
-
+glm::mat4 getRotation(const glm::vec3& ori_x,
+                      const glm::vec3& ori_y,
+                      const glm::vec3& ori_z);
 // Create scaling matrix.
 glm::mat4 getScale(const glm::vec3& u);
 

@@ -91,6 +91,7 @@ int main()
     // Create texture.
     Texture texture0("../assets/wood3.jpeg");
     Texture texture1("../assets/wood1.jpeg");
+    Texture texture2("../assets/black-brick2.jpg");
 
     /*** Setup the table scene. ***/
     // Table variables.
@@ -118,11 +119,16 @@ int main()
     vector<unsigned int> ico_indices;
     createIcosahedron(ico_vertices, ico_indices);
     Mesh icosahedron(ico_vertices, ico_indices);
-    vec3 ico_position{0.0f, table_top_y + 1.f, 0.0f};
+    vec3 ico_position{0.0f, table_top_y + 0.5f, 0.0f};
 
+    // Floor and walls.
+    const float floor_width = 5.0f;
+    const float floor_depth = 5.0f;
+    const vec3 wall_1_pos = vec3(-floor_width/2, floor_depth/2, 0.0f);
+    const vec3 wall_2_pos = vec3(0.0f, floor_depth/2, -floor_width/2);
     // Setup camera with Y as the up direction.
     const vec3 up{0.0f, 1.0f, 0.0f};
-    vec3 camera_pos{3.0f, 2.0f, 3.0f};
+    vec3 camera_pos{2.7f, 2.7f, 2.7f};
     vec3 target{0.0f, table_top_y, 0.0f};
 
     // Main loop.
@@ -172,23 +178,39 @@ int main()
         texture0.unbind();
 
         // Draw icosahedron.
-        model = getScale(vec3(0.5f));
+        model = getScale(vec3(0.35f));
         model = getRotationY(50 * tick) * model;
         model = getTranslation(ico_position) * model;
         shader_normal.use();
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(icosahedron.vao);
         icosahedron.draw();
 
         // Draw floor.
-        model = getScale(vec3(5.0f, 0.0f, 5.0f));
-        texture1.bind(1);
-        shader_texture.use();
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(square.vao);
+        shader_texture.use();
+        texture1.bind(1);
+        model = getScale(vec3(floor_depth, 0.0f, floor_width));
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
         square.draw();
         texture1.unbind();
+        // Draw walls.
+        texture2.bind(0);
+        model = getScale(vec3(floor_depth, 0.0f, floor_width));
+        model = getRotationZ(-90.0f) * model;
+        model = getTranslation(wall_1_pos) * model;
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        square.draw();
+        model = getScale(vec3(floor_depth, 0.0f, floor_width));
+        model = getRotationX(-90.0f) * model;
+        model = getTranslation(wall_2_pos) * model;
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        square.draw();
+        texture2.unbind();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
