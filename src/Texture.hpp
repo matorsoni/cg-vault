@@ -17,7 +17,7 @@ public:
     ~Texture() = default;
 
     // Bind texture to a specific slot.
-    void bind(int slot);
+    void bind(int slot = 0);
     // Unbind texture.
     void unbind();
 };

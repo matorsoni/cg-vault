@@ -92,11 +92,12 @@ int main()
     Texture texture0("../assets/wood3.jpeg");
     Texture texture1("../assets/wood1.jpeg");
     Texture texture2("../assets/black-brick2.jpg");
+    Texture texture3("../assets/chess.jpeg");
 
     /*** Setup the table scene. ***/
     // Table variables.
     const float table_width = 2.0f;
-    const float table_depth = 0.75f;
+    const float table_depth = 1.0f;
     const float table_height = 1.0f;
     const float leg_width = 0.1f;
     const float top_girth = 0.1f;
@@ -119,7 +120,7 @@ int main()
     vector<unsigned int> ico_indices;
     createIcosahedron(ico_vertices, ico_indices);
     Mesh icosahedron(ico_vertices, ico_indices);
-    vec3 ico_position{0.0f, table_top_y + 0.5f, 0.0f};
+    vec3 ico_position{0.0f, table_top_y + 0.8f, -0.5f};
 
     // Floor and walls.
     const float floor_width = 5.0f;
@@ -150,21 +151,17 @@ int main()
         // Final transformation.
         mat4 transf = proj * view;
 
-        // Bind texture.
-        texture0.bind(0);
-
         // Draw table.
         shader_texture.use();
-        shader_texture.setUniform1i("u_sampler0", 0);
-        shader_texture.setUniform1i("u_sampler1", 1);
-        shader_texture.setUniform4f("u_color", 0.0f, green, 0.0f, 1.0f);
+        shader_texture.setUniform1i("u_sampler", 0);
         shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        texture0.bind(0);
+        // Start with the table top.
         mat4 model(1.0f);
-        glBindVertexArray(cube.vao);
-        // Draw table top.
         model = getScale(top_scale);
         model = getTranslation(top_position) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        glBindVertexArray(cube.vao);
         cube.draw();
         // Draw legs.
         for (int i = 0; i < 4; ++i) {
@@ -185,21 +182,26 @@ int main()
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
         shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glBindVertexArray(icosahedron.vao);
+        // Draw wireframe.
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         icosahedron.draw();
+        // Turn back to fill triangles.
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // Draw floor.
-        glBindVertexArray(square.vao);
-        shader_texture.use();
-        texture1.bind(1);
+        texture1.bind(0);
         model = getScale(vec3(floor_depth, 0.0f, floor_width));
+        shader_texture.use();
+        shader_texture.setUniform1i("u_sampler", 0);
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        glBindVertexArray(square.vao);
         square.draw();
         texture1.unbind();
         // Draw walls.
         texture2.bind(0);
         model = getScale(vec3(floor_depth, 0.0f, floor_width));
-        model = getRotationZ(-90.0f) * model;
+        model = getRotationX(90.0f) * getRotationZ(-90.0f) * model;
         model = getTranslation(wall_1_pos) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
@@ -211,6 +213,13 @@ int main()
         shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
         square.draw();
         texture2.unbind();
+        // Draw chessboard.
+        texture3.bind(0);
+        model = getScale(vec3(0.8f));
+        model = getRotationY(60.0f) * model;
+        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, -0.25f));
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        square.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
