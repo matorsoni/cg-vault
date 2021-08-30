@@ -1,7 +1,13 @@
 #include "Math.hpp"
 
-using namespace glm;
+#include <cmath>
 
+using glm::vec3;
+using glm::vec4;
+using glm::mat4;
+using glm::radians;
+
+using namespace std;
 
 mat4 getRotationX(float angle)
 {
@@ -42,9 +48,9 @@ mat4 getRotationZ(float angle)
     );
 }
 
-mat4 getRotation(const glm::vec3& ori_x,
-                 const glm::vec3& ori_y,
-                 const glm::vec3& ori_z)
+mat4 getRotation(const vec3& ori_x,
+                 const vec3& ori_y,
+                 const vec3& ori_z)
 {
     return mat4(vec4(glm::normalize(ori_x), 0.0f),
                 vec4(glm::normalize(ori_y), 0.0f),
@@ -93,4 +99,50 @@ mat4 getView(const vec3& camera_pos, const vec3& up, const vec3& target)
     inv_translation[3] = vec4(-camera_pos, 1.0f);
 
     return inv_rotation * inv_translation;
+}
+
+
+uint64_t factorial(int n)
+{
+    assert(n >= 0);
+
+    if (n == 0)
+        return 1;
+
+    uint64_t result = 1;
+    while (n > 0) {
+        result *= static_cast<uint64_t>(n);
+        n--;
+    }
+
+    return result;
+}
+
+float bernstein(int n, int i, float x)
+{
+    assert(n >= 0);
+    assert(i >= 0);
+    assert(i <= n);
+    assert(x >= 0.0f);
+    assert(x <= 1.0f);
+
+    float binomial = static_cast<float>(factorial(n) / (factorial(i) * factorial(n - i)));
+    return binomial * powf(x, i) * powf(1.0f-x, n-i);
+}
+
+vec3 bezierSurfaceSample(const vector<vec3>& control_points, int rows, int cols, float u, float v)
+{
+    vec3 point{0.0f};
+    for (int i = 0; i < rows; ++i) {
+        float bern_i = bernstein(rows, i, u);
+        vec3 aux_point{0.0f};
+        for (int j = 0; j < cols; ++j) {
+            float bern_j = bernstein(cols, j, v);
+            aux_point += bern_j * control_points[i*cols + j];
+        }
+
+        point += bern_i * aux_point;
+    }
+
+    return point;
 }
