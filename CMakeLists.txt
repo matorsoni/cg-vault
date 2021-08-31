@@ -14,6 +14,7 @@ add_executable(
     src/Math.cpp
     src/Mesh.cpp
     src/ShaderProgram.cpp
+    src/Teapot.cpp
     src/Texture.cpp
 )
 

@@ -10,6 +10,7 @@
 #include "Math.hpp"
 #include "Mesh.hpp"
 #include "ShaderProgram.hpp"
+#include "Teapot.hpp"
 #include "Texture.hpp"
 
 using namespace std;
@@ -81,19 +82,12 @@ int main()
     createSquare(square_vertices, square_indices);
     Mesh square(square_vertices, square_indices);
 
-    // Create Bezier mesh.
-    vector<vec3> control_points = {
-        {0.0f, 2.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 1.0f}, {1.0f, 2.0f, 1.0f}, {2.0f, 2.0f, 1.0f},
-        {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {2.0f, 1.0f, 1.0f}
-    };
-    const int bezier_rows = 3;
-    const int bezier_cols = 3;
-    const float density = 3.0f;
-    vector<Vertex> bezier_vertices;
-    vector<unsigned int> bezier_indices;
-    createBezierPatch(bezier_vertices, bezier_indices, control_points, bezier_rows, bezier_cols, density);
-    Mesh bezier(bezier_vertices, bezier_indices);
+    // Create Teapot mesh.
+    const float density = 20.0f;
+    vector<Vertex> teapot_vertices;
+    vector<unsigned int> teapot_indices;
+    createTeapot(teapot_vertices, teapot_indices, density);
+    Mesh teapot(teapot_vertices, teapot_indices);
 
     // Load shader program.
     ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
@@ -236,15 +230,15 @@ int main()
         //square.draw();
         texture3.unbind();
 
-        // Draw bezier.
-        glBindVertexArray(bezier.vao);
+        // Draw teapot.
+        glBindVertexArray(teapot.vao);
         texture1.bind(0);
         model = mat4(1.0f);
         model = getRotationY(50 * tick) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
         shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        bezier.draw();
+        teapot.draw();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glfwSwapBuffers(window);

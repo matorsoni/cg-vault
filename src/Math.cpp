@@ -124,7 +124,7 @@ float bernstein(int n, int i, float x)
     assert(i >= 0);
     assert(i <= n);
     assert(x >= 0.0f);
-    assert(x <= 1.0f);
+    assert(x <= 1.001f);
 
     float binomial = static_cast<float>(factorial(n) / (factorial(i) * factorial(n - i)));
     return binomial * powf(x, i) * powf(1.0f-x, n-i);
