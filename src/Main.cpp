@@ -81,6 +81,20 @@ int main()
     createSquare(square_vertices, square_indices);
     Mesh square(square_vertices, square_indices);
 
+    // Create Bezier mesh.
+    vector<vec3> control_points = {
+        {0.0f, 2.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {2.0f, 2.0f, 0.0f},
+        {0.0f, 2.0f, 1.0f}, {1.0f, 2.0f, 1.0f}, {2.0f, 2.0f, 1.0f},
+        {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {2.0f, 1.0f, 1.0f}
+    };
+    const int bezier_rows = 3;
+    const int bezier_cols = 3;
+    const float density = 3.0f;
+    vector<Vertex> bezier_vertices;
+    vector<unsigned int> bezier_indices;
+    createBezierPatch(bezier_vertices, bezier_indices, control_points, bezier_rows, bezier_cols, density);
+    Mesh bezier(bezier_vertices, bezier_indices);
+
     // Load shader program.
     ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
     ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert", "../src/shader/VertexColor.frag");
@@ -219,7 +233,19 @@ int main()
         model = getRotationY(60.0f) * model;
         model = getTranslation(vec3(0.0f, table_top_y + 0.01f, -0.25f));
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        square.draw();
+        //square.draw();
+        texture3.unbind();
+
+        // Draw bezier.
+        glBindVertexArray(bezier.vao);
+        texture1.bind(0);
+        model = mat4(1.0f);
+        model = getRotationY(50 * tick) * model;
+        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        bezier.draw();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

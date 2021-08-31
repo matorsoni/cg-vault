@@ -134,10 +134,10 @@ vec3 bezierSurfaceSample(const vector<vec3>& control_points, int rows, int cols,
 {
     vec3 point{0.0f};
     for (int i = 0; i < rows; ++i) {
-        float bern_i = bernstein(rows, i, u);
+        float bern_i = bernstein(rows-1, i, u);
         vec3 aux_point{0.0f};
         for (int j = 0; j < cols; ++j) {
-            float bern_j = bernstein(cols, j, v);
+            float bern_j = bernstein(cols-1, j, v);
             aux_point += bern_j * control_points[i*cols + j];
         }
 

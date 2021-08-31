@@ -230,5 +230,5 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     }
 
     // Triangulate the sampled patch.
-    triangulatePatch(indices, rows, cols);
+    triangulatePatch(indices, row_samples, col_samples);
 }
