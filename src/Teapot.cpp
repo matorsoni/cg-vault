@@ -5,28 +5,68 @@
 using glm::vec3;
 using namespace std;
 
-// Teapot original dataset from "The Origins of the Teapot", 1987.
-static vector<vec3> teapotVertices();
-static vector<unsigned int> teapotRimPatch();
-static vector<unsigned int> teapotBodyPatch();
-static vector<unsigned int> teapotHandlePatch();
-static vector<unsigned int> teapotSpoutPatch();
-static vector<unsigned int> teapotLidPatch();
-static vector<unsigned int> teapotBottomPatch();
+// Teapot parts, according to the original dataset from "The Origins of the Teapot", 1987.
+enum class TeapotParts
+{
+    RIM,
+    BODY,
+    HANDLE,
+    SPOUT,
+    LID,
+    BOTTOM
+};
 
-// The original teapot dataset use the same patch size.
-static const int PATCH_SIZE = 16;
+// Functions to retrieve the teapot's original dataset.
+static vector<vec3> teapotVertices();
+static vector<unsigned int> teapotPatch(TeapotParts part);
+
+// The original teapot dataset uses the same patch size of 16.
+const int PATCH_ROWS = 4;
+const int PATCH_COLS = 4;
+const int PATCH_SIZE = PATCH_ROWS * PATCH_COLS;
 
 void createTeapot(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, float density)
 {
-    vector<vec3> control_points = {
-        {0.0f, 2.0f, 0.0f}, {1.0f, 2.0f, 0.0f}, {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 1.0f}, {1.0f, 2.0f, 1.0f}, {2.0f, 2.0f, 1.0f},
-        {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {2.0f, 1.0f, 1.0f}
+    const auto teapot_vertices = teapotVertices();
+    const vector<TeapotParts> teapot_parts = {
+        TeapotParts::RIM,
+        TeapotParts::BODY,
+        TeapotParts::HANDLE,
+        TeapotParts::SPOUT,
+        TeapotParts::LID,
+        TeapotParts::BOTTOM
     };
-    const int bezier_rows = 3;
-    const int bezier_cols = 3;
-    createBezierPatch(vertices, indices, control_points, bezier_rows, bezier_cols, density);
+
+    // Populate the mesh with all the teapot parts.
+    for (const auto& part : teapot_parts) {
+        const auto part_indices = teapotPatch(part);
+        assert(part_indices.size() % PATCH_SIZE == 0);
+
+        // Reuse te control points buffer for each part.
+        vector<vec3> control_points;
+        control_points.reserve(PATCH_SIZE);
+        // Number of patches.
+        const auto n_patches = part_indices.size() / PATCH_SIZE;
+
+        // For each patch:
+        // 1. Get its control points;
+        // 2. Sample the Bezier surface;
+        // 3. Triangulate it and append it to the mesh.
+        for (int patch = 0; patch < n_patches; ++patch) {
+            const int first_index = patch * PATCH_SIZE;
+            const int last_index = first_index + PATCH_SIZE;
+
+            // Get the control point from each index of this patch.
+            for (int i = first_index; i < last_index; ++i) {
+                auto index = part_indices[i];
+                control_points.emplace_back(teapot_vertices[index]);
+            }
+
+            // Create the sampled bezier and append to the mesh.
+            createBezierPatch(vertices, indices, control_points, PATCH_ROWS, PATCH_COLS, density);
+            control_points.clear();
+        }
+    }
 }
 
 static vector<vec3> teapotVertices()
@@ -342,114 +382,72 @@ static vector<vec3> teapotVertices()
 }
 
 // The original dataset has indices starting at 1.
-// These functions correct the patches so their indices start at 0.
-
-// Rim.
-static vector<unsigned int> teapotRimPatch()
+// This function returns the correct patches with indices starting at 0.
+static vector<unsigned int> teapotPatch(TeapotParts part)
 {
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-        4, 17, 18, 19, 8, 20, 21, 22, 12, 23, 24, 25, 16, 26, 27, 28,
-        19, 29, 30, 31, 22, 32, 33, 34, 25, 35, 36, 37, 28, 38, 39, 40,
-        31, 41, 42, 1, 34, 43, 44, 5, 37, 45, 46, 9, 40, 47, 48, 13
-    };
+    vector<unsigned int> patch_indices;
+
+    if (part == TeapotParts::RIM) {
+        patch_indices = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+            4, 17, 18, 19, 8, 20, 21, 22, 12, 23, 24, 25, 16, 26, 27, 28,
+            19, 29, 30, 31, 22, 32, 33, 34, 25, 35, 36, 37, 28, 38, 39, 40,
+            31, 41, 42, 1, 34, 43, 44, 5, 37, 45, 46, 9, 40, 47, 48, 13
+        };
+    }
+    else if (part == TeapotParts::BODY) {
+        patch_indices = {
+            13, 14, 15, 16, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+            16, 26, 27, 28, 52, 61, 62, 63, 56, 64, 65, 66, 60, 67, 68, 69,
+            28, 38, 39, 40, 63, 70, 71, 72, 66, 73, 74, 75, 69, 76, 77, 78,
+            40, 47, 48, 13, 72, 79, 80, 49, 75, 81, 82, 53, 78, 83, 84, 57,
+            57, 58, 59, 60, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96,
+            60, 67, 68, 69, 88, 97, 98, 99, 92, 100, 101, 102, 96, 103, 104, 105,
+            69, 76, 77, 78, 99, 106, 107, 108, 102, 109, 110, 111, 105, 112, 113, 114,
+            78, 83, 84, 57, 108, 115, 116, 85, 111, 117, 118, 89, 114, 119, 120, 93
+        };
+    }
+    else if (part == TeapotParts::HANDLE) {
+        patch_indices = {
+            121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136,
+            124, 137, 138, 121, 128, 139, 140, 125, 132, 141, 142, 129, 136, 143, 144, 133,
+            133, 134, 135, 136, 145, 146, 147, 148, 149, 150, 151, 152, 69, 153, 154, 155,
+            136, 143, 144, 133, 148, 156, 157, 145, 152, 158, 159, 149, 155, 160, 161, 69
+        };
+    }
+    else if (part == TeapotParts::SPOUT) {
+        patch_indices = {
+            162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177,
+            165, 178, 179, 162, 169, 180, 181, 166, 173, 182, 183, 170, 177, 184, 185, 174,
+            174, 175, 176, 177, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197,
+            177, 184, 185, 174, 189, 198, 199, 186, 193, 200, 201, 190, 197, 202, 203, 194
+        };
+    }
+    else if (part == TeapotParts::LID) {
+        patch_indices = {
+            204, 204, 204, 204, 207, 208, 209, 210, 211, 211, 211, 211, 212, 213, 214, 215,
+            204, 204, 204, 204, 210, 217, 218, 219, 211, 211, 211, 211, 215, 220, 221, 222,
+            204, 204, 204, 204, 219, 224, 225, 226, 211, 211, 211, 211, 222, 227, 228, 229,
+            204, 204, 204, 204, 226, 230, 231, 207, 211, 211, 211, 211, 229, 232, 233, 212,
+            212, 213, 214, 215, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245,
+            215, 220, 221, 222, 237, 246, 247, 248, 241, 249, 250, 251, 245, 252, 253, 254,
+            222, 227, 228, 229, 248, 255, 256, 257, 251, 258, 259, 260, 254, 261, 262, 263,
+            229, 232, 233, 212, 257, 264, 265, 234, 260, 266, 267, 238, 263, 268, 269, 242
+        };
+    }
+    else {
+        // part == TeapotParts::BOTTOM.
+        patch_indices = {
+            270, 270, 270, 270, 279, 280, 281, 282, 275, 276, 277, 278, 271, 272, 273, 274,
+            270, 270, 270, 270, 282, 289, 290, 291, 278, 286, 287, 288, 274, 283, 284, 285,
+            270, 270, 270, 270, 291, 298, 299, 300, 288, 295, 296, 297, 285, 292, 293, 294,
+            270, 270, 270, 270, 300, 305, 306, 279, 297, 303, 304, 275, 294, 301, 302, 271
+        };
+    }
 
     // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
-
-    return patch_indices;
-}
-
-// Body.
-static vector<unsigned int> teapotBodyPatch()
-{
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        13, 14, 15, 16, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-        16, 26, 27, 28, 52, 61, 62, 63, 56, 64, 65, 66, 60, 67, 68, 69,
-        28, 38, 39, 40, 63, 70, 71, 72, 66, 73, 74, 75, 69, 76, 77, 78,
-        40, 47, 48, 13, 72, 79, 80, 49, 75, 81, 82, 53, 78, 83, 84, 57,
-        57, 58, 59, 60, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96,
-        60, 67, 68, 69, 88, 97, 98, 99, 92, 100, 101, 102, 96, 103, 104, 105,
-        69, 76, 77, 78, 99, 106, 107, 108, 102, 109, 110, 111, 105, 112, 113, 114,
-        78, 83, 84, 57, 108, 115, 116, 85, 111, 117, 118, 89, 114, 119, 120, 93
-    };
-
-    // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
-
-    return patch_indices;
-}
-
-// Handle.
-static vector<unsigned int> teapotHandlePatch()
-{
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136,
-        124, 137, 138, 121, 128, 139, 140, 125, 132, 141, 142, 129, 136, 143, 144, 133,
-        133, 134, 135, 136, 145, 146, 147, 148, 149, 150, 151, 152, 69, 153, 154, 155,
-        136, 143, 144, 133, 148, 156, 157, 145, 152, 158, 159, 149, 155, 160, 161, 69
-    };
-
-    // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
-
-    return patch_indices;
-}
-
-// Spout.
-static vector<unsigned int> teapotSpoutPatch()
-{
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177,
-        165, 178, 179, 162, 169, 180, 181, 166, 173, 182, 183, 170, 177, 184, 185, 174,
-        174, 175, 176, 177, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197,
-        177, 184, 185, 174, 189, 198, 199, 186, 193, 200, 201, 190, 197, 202, 203, 194
-    };
-
-    // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
-
-    return patch_indices;
-}
-
-// Lid.
-static vector<unsigned int> teapotLidPatch()
-{
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        204, 204, 204, 204, 207, 208, 209, 210, 211, 211, 211, 211, 212, 213, 214, 215,
-        204, 204, 204, 204, 210, 217, 218, 219, 211, 211, 211, 211, 215, 220, 221, 222,
-        204, 204, 204, 204, 219, 224, 225, 226, 211, 211, 211, 211, 222, 227, 228, 229,
-        204, 204, 204, 204, 226, 230, 231, 207, 211, 211, 211, 211, 229, 232, 233, 212,
-        212, 213, 214, 215, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245,
-        215, 220, 221, 222, 237, 246, 247, 248, 241, 249, 250, 251, 245, 252, 253, 254,
-        222, 227, 228, 229, 248, 255, 256, 257, 251, 258, 259, 260, 254, 261, 262, 263,
-        229, 232, 233, 212, 257, 264, 265, 234, 260, 266, 267, 238, 263, 268, 269, 242
-    };
-
-    // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
-
-    return patch_indices;
-}
-
-// Bottom.
-static vector<unsigned int> teapotBottomPatch()
-{
-    // Patch indices from the original dataset.
-    vector<unsigned int> patch_indices = {
-        270, 270, 270, 270, 279, 280, 281, 282, 275, 276, 277, 278, 271, 272, 273, 274,
-        270, 270, 270, 270, 282, 289, 290, 291, 278, 286, 287, 288, 274, 283, 284, 285,
-        270, 270, 270, 270, 291, 298, 299, 300, 288, 295, 296, 297, 285, 292, 293, 294,
-        270, 270, 270, 270, 300, 305, 306, 279, 297, 303, 304, 275, 294, 301, 302, 271
-    };
-
-    // Subtract 1 to start indices at 0.
-    for (auto& index : patch_indices) index--;
+    for (auto& index : patch_indices)
+        index--;
 
     return patch_indices;
 }

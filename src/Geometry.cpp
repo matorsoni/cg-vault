@@ -216,8 +216,9 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     const float row_step = 1.0f / (row_samples - 1);
     const float col_step = 1.0f / (col_samples - 1);
 
+    const unsigned int initial_vertex_count = vertices.size();
+
     // Sample from Bezier surface.
-    vertices.reserve(row_samples * col_samples);
     float u = 0.0f;
     float v = 0.0f;
     for (int i = 0; i < row_samples; ++i) {
@@ -230,5 +231,5 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     }
 
     // Triangulate the sampled patch.
-    triangulatePatch(indices, row_samples, col_samples);
+    triangulatePatch(indices, row_samples, col_samples, false, false, initial_vertex_count);
 }
