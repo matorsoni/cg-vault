@@ -8,10 +8,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Math.hpp"
-#include "Mesh.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
 #include "Texture.hpp"
+#include "VertexArray.hpp"
 
 using namespace std;
 using glm::mat4;
@@ -71,23 +71,23 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    // Create cube mesh.
+    // Create cube VertexArray.
     vector<Vertex> cube_vertices;
     createCube(cube_vertices);
-    Mesh cube(cube_vertices, {});
+    VertexArray cube(cube_vertices, {});
 
-    // Create square mesh.
+    // Create square VertexArray.
     vector<Vertex> square_vertices;
     vector<unsigned int> square_indices;
     createSquare(square_vertices, square_indices);
-    Mesh square(square_vertices, square_indices);
+    VertexArray square(square_vertices, square_indices);
 
-    // Create Teapot mesh.
+    // Create Teapot VertexArray.
     const float density = 2.0f;
     vector<Vertex> teapot_vertices;
     vector<unsigned int> teapot_indices;
     createTeapot(teapot_vertices, teapot_indices, density);
-    Mesh teapot(teapot_vertices, teapot_indices);
+    VertexArray teapot(teapot_vertices, teapot_indices);
 
     // Load shader program.
     ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
@@ -127,7 +127,7 @@ int main()
     vector<Vertex> ico_vertices;
     vector<unsigned int> ico_indices;
     createIcosahedron(ico_vertices, ico_indices);
-    Mesh icosahedron(ico_vertices, ico_indices);
+    VertexArray icosahedron(ico_vertices, ico_indices);
     vec3 ico_position{0.0f, table_top_y + 0.8f, -0.5f};
 
     // Floor and walls.

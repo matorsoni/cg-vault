@@ -1,13 +1,13 @@
-#include "Mesh.hpp"
+#include "VertexArray.hpp"
 
 #include <glad/glad.h>
 
 using namespace std;
 
-Mesh::Mesh(const vector<Vertex>& p_vertices,
-           const vector<unsigned int>& p_indices)
+VertexArray::VertexArray(const vector<Vertex>& p_vertices,
+                         const vector<unsigned int>& p_indices)
 {
-    // Copy vertices to the mesh object.
+    // Copy vertices to the VertexArray object.
     vertices.reserve(p_vertices.size());
     for (const auto& v : p_vertices)
         vertices.emplace_back(v);
@@ -31,7 +31,7 @@ Mesh::Mesh(const vector<Vertex>& p_vertices,
 
     // Setup Element Buffer Object if there are indices.
     if (p_indices.size() != 0) {
-        // Copy indices to the mesh object.
+        // Copy indices to the VertexArray object.
         indices.reserve(p_indices.size());
         for (const auto& ind : p_indices)
             indices.emplace_back(ind);
@@ -48,7 +48,7 @@ Mesh::Mesh(const vector<Vertex>& p_vertices,
     glBindVertexArray(0);
 }
 
-void Mesh::draw()
+void VertexArray::draw()
 {
     if (indices.empty()) {
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
