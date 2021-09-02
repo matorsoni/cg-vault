@@ -5,6 +5,8 @@
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
+using glm::cross;
+using glm::normalize;
 using glm::radians;
 
 using namespace std;
@@ -118,31 +120,68 @@ uint64_t factorial(int n)
     return result;
 }
 
+// Bernstein polynomial.
 float bernstein(int n, int i, float x)
 {
-    assert(n >= 0);
-    assert(i >= 0);
-    assert(i <= n);
+    // Allow some imprecision.
     assert(x >= 0.0f);
     assert(x <= 1.001f);
+
+    if (n < 0 || i < 0 || i > n) {
+        return 0.0f;
+    }
+
+    if (n == 0) {
+        return 1.0f;
+    }
 
     float binomial = static_cast<float>(factorial(n) / (factorial(i) * factorial(n - i)));
     return binomial * powf(x, i) * powf(1.0f-x, n-i);
 }
 
-vec3 bezierSurfaceSample(const vector<vec3>& control_points, int rows, int cols, float u, float v)
+// Derivative of the Bernstein polynomial.
+float d_bernstein(int n, int i, float x)
 {
-    vec3 point{0.0f};
+    assert (n >= 0);
+    return (bernstein(n-1, i-1, x) - bernstein(n-1, i, x)) * n;
+}
+
+// Compute the position and normal vectors at surface point (u,v).
+tuple<vec3, vec3> bezierSurfaceSample(const vector<vec3>& control_points,
+                                      int rows,
+                                      int cols,
+                                      float u,
+                                      float v)
+{
+    // Position, derivatives of position with respect to u and v.
+    vec3 position{0.0f};
+    vec3 du_position{0.0f};
+    vec3 dv_position{0.0f};
+
+    // Compute sums on the Bezier surface, following this notation:
+    // https://en.wikipedia.org/wiki/B%C3%A9zier_surface
     for (int i = 0; i < rows; ++i) {
-        float bern_i = bernstein(rows-1, i, u);
-        vec3 aux_point{0.0f};
+        vec3 sum_v{0.0f};
+        vec3 sum_dv{0.0f};
+        const float bern_i = bernstein(rows-1, i, u);
+        const float d_bern_i = d_bernstein(rows-1, i, u);
+
         for (int j = 0; j < cols; ++j) {
-            float bern_j = bernstein(cols-1, j, v);
-            aux_point += bern_j * control_points[i*cols + j];
+            const float bern_j = bernstein(cols-1, j, v);
+            const float d_bern_j = d_bernstein(cols-1, j, v);
+            const vec3 k_ij = control_points[i*cols + j];
+
+            sum_v += bern_j * k_ij;
+            sum_dv += d_bern_j * k_ij;
         }
 
-        point += bern_i * aux_point;
+        position += bern_i * sum_v;
+        du_position += d_bern_i * sum_v;
+        dv_position += bern_i * sum_dv;
     }
 
-    return point;
+    // Compute normalized normal.
+    vec3 normal = normalize(cross(du_position, dv_position));
+
+    return make_tuple(position, normal);
 }

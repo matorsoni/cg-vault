@@ -2,6 +2,7 @@
 #define MATH_HPP
 
 #include <cstdint>
+#include <tuple>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -22,9 +23,18 @@ glm::mat4 getTranslation(const glm::vec3& u);
 // Create View transform.
 glm::mat4 getView(const glm::vec3& camera_pos, const glm::vec3& up, const glm::vec3& target);
 
-// Functions for Bezier curves and patches.
+// Simple factorial.
 uint64_t factorial(int n);
+
+// Bernstein polynomial and its derivative.
 float bernstein(int n, int i, float x);
-glm::vec3 bezierSurfaceSample(const std::vector<glm::vec3>& control_points, int rows, int cols, float u, float v);
+float d_bernstein(int n, int i, float x);
+
+// Compute the position and normal vectors at surface point (u,v).
+std::tuple<glm::vec3, glm::vec3> bezierSurfaceSample(const std::vector<glm::vec3>& control_points,
+                                                     int rows,
+                                                     int cols,
+                                                     float u,
+                                                     float v);
 
 #endif // MATH_HPP

@@ -83,7 +83,7 @@ int main()
     Mesh square(square_vertices, square_indices);
 
     // Create Teapot mesh.
-    const float density = 20.0f;
+    const float density = 2.0f;
     vector<Vertex> teapot_vertices;
     vector<unsigned int> teapot_indices;
     createTeapot(teapot_vertices, teapot_indices, density);
@@ -232,12 +232,14 @@ int main()
 
         // Draw teapot.
         glBindVertexArray(teapot.vao);
-        texture1.bind(0);
         model = mat4(1.0f);
+        model = getScale({0.5f, 0.5f, 0.5f}) * model;
+        model = getRotationX(-90) * model;
         model = getRotationY(50 * tick) * model;
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        shader_normal.use();
+        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         teapot.draw();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

@@ -1,6 +1,7 @@
 #include "Geometry.hpp"
 
 #include <cmath>
+#include <tuple>
 
 #include "Math.hpp"
 
@@ -223,7 +224,11 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     float v = 0.0f;
     for (int i = 0; i < row_samples; ++i) {
         for (int j = 0; j < col_samples; ++j) {
-            vertices.emplace_back(bezierSurfaceSample(control_points, rows, cols, u, v));
+            const auto sample = bezierSurfaceSample(control_points, rows, cols, u, v);
+            const vec3 position = get<0>(sample);
+            const vec3 normal = get<1>(sample);
+            vertices.emplace_back(position, normal);
+
             v += col_step;
         }
         u += row_step;
