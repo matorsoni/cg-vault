@@ -223,19 +223,19 @@ int main()
         texture2.unbind();
         // Draw chessboard.
         texture3.bind(0);
-        model = getScale(vec3(0.8f));
-        model = getRotationY(60.0f) * model;
-        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, -0.25f));
+        model = getScale(vec3(1.0f));
+        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, -0.5f)) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        //square.draw();
+        square.draw();
         texture3.unbind();
 
         // Draw teapot.
         glBindVertexArray(teapot.vao);
         model = mat4(1.0f);
-        model = getScale({0.5f, 0.5f, 0.5f}) * model;
+        model = getScale({0.2f, 0.2f, 0.2f}) * model;
         model = getRotationX(-90) * model;
         model = getRotationY(50 * tick) * model;
+        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, 0.65f)) * model;
         shader_normal.use();
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
         shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
