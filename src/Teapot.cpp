@@ -68,11 +68,11 @@ Mesh createTeapot(float sample_density)
             }
 
             // Create the sampled bezier surface and append it to the mesh.
-            createBezierPatch(mesh,
-                              control_points,
-                              PATCH_ROWS,
-                              PATCH_COLS,
-                              sample_density);
+            const Mesh bezier_mesh = createBezierPatch(control_points,
+                                                       PATCH_ROWS,
+                                                       PATCH_COLS,
+                                                       sample_density);
+            mesh.extend(bezier_mesh);
 
             // Clear control points for the next patch.
             control_points.clear();

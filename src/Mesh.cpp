@@ -24,3 +24,19 @@ Mesh::Mesh(const vector<Vertex>& p_vertices):
     Mesh(p_vertices, {})
 {
 }
+
+void Mesh::extend(const Mesh& mesh)
+{
+    if (mesh.indices.empty()) {
+        return;
+    }
+
+    const unsigned int initial_vertex_count = vertices.size();
+    for (const auto& v : mesh.vertices) {
+        vertices.emplace_back(v);
+    }
+
+    for (const auto& ind : mesh.indices) {
+        indices.emplace_back(initial_vertex_count + ind);
+    }
+}
