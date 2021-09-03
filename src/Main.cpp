@@ -79,7 +79,9 @@ int main()
     VertexArray square(createSquare());
 
     // Icosahedron.
-    VertexArray icosahedron(createIcosahedron());
+    Mesh ico_mesh = createIcosahedron();
+    subdivide(ico_mesh);
+    VertexArray icosahedron(ico_mesh);
 
     // Create Teapot VertexArray.
     const float sample_density = 2.0f;

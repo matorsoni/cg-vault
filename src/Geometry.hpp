@@ -7,6 +7,8 @@
 
 #include "Mesh.hpp"
 
+void subdivide(Mesh& mesh, bool project_onto_unit_sphere = true);
+
 Mesh createCubeWithoutIndices();
 
 Mesh createCube();

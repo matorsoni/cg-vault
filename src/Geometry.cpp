@@ -3,11 +3,14 @@
 #include <cmath>
 #include <tuple>   // For std::tuple
 
+#include <glm/glm.hpp>
+
 #include "Math.hpp"
 
 using namespace std;
 using glm::vec2;
 using glm::vec3;
+using glm::normalize;
 
 // Generate triangle indices for a rectangular patch and append it to the input indicex list.
 static void triangulatePatch(vector<unsigned int>& indices,
@@ -68,6 +71,79 @@ static void triangulatePatch(vector<unsigned int>& indices,
             indices.emplace_back(below);
             indices.emplace_back(right_below);
         }
+    }
+}
+
+
+// Subdivide each triangle in a mesh.
+void subdivide(Mesh& mesh, bool project_onto_unit_sphere)
+{
+    assert(!mesh.indices.empty());
+    assert(mesh.indices.size() % 3 == 0);
+
+    const auto initial_index_count = mesh.indices.size();
+
+    for (int tri_index_slot = 0; tri_index_slot < initial_index_count; tri_index_slot += 3) {
+        // Retrieve triangle data.
+        const unsigned int index[3] = {
+            mesh.indices.at(tri_index_slot),
+            mesh.indices.at(tri_index_slot + 1),
+            mesh.indices.at(tri_index_slot + 2)
+        };
+        const vec3 tri_pos[3] = {
+            mesh.vertices.at(index[0]).pos,
+            mesh.vertices.at(index[1]).pos,
+            mesh.vertices.at(index[2]).pos
+        };
+
+        // Compute mean points between vertices.
+        vec3 new_pos[3] = {
+            (tri_pos[0] + tri_pos[1]) * 0.5f,
+            (tri_pos[1] + tri_pos[2]) * 0.5f,
+            (tri_pos[2] + tri_pos[0]) * 0.5f
+        };
+
+        unsigned int previous_vertex_count = mesh.vertices.size();
+
+        if (project_onto_unit_sphere) {
+            for (auto& p : new_pos) {
+                p = normalize(p);
+                mesh.vertices.emplace_back(p, p);
+            }
+        }
+        else {
+            for (const auto& p : new_pos) {
+                mesh.vertices.emplace_back(p);
+            }
+        }
+
+        // Define new triangles.
+        const unsigned int new_pos_index[3] = {
+            previous_vertex_count,
+            previous_vertex_count + 1,
+            previous_vertex_count + 2
+        };
+
+        // Top triangle.
+        mesh.indices.push_back(index[0]);
+        mesh.indices.push_back(new_pos_index[0]);
+        mesh.indices.push_back(new_pos_index[2]);
+        // Left triangle.
+        mesh.indices.push_back(new_pos_index[0]);
+        mesh.indices.push_back(index[1]);
+        mesh.indices.push_back(new_pos_index[1]);
+        // Right triangle.
+        mesh.indices.push_back(new_pos_index[2]);
+        mesh.indices.push_back(new_pos_index[1]);
+        mesh.indices.push_back(index[2]);
+        // Middle triangle.
+        mesh.indices.push_back(new_pos_index[0]);
+        mesh.indices.push_back(new_pos_index[1]);
+        mesh.indices.push_back(new_pos_index[2]);
+
+        // Erase the base triangle.
+        //mesh.indices.erase(mesh.indices.begin() + tri_index_slot,
+        //                   mesh.indices.begin() + tri_index_slot + 3);
     }
 }
 
