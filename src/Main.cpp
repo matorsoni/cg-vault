@@ -161,7 +161,7 @@ int main()
         // Draw table.
         shader_texture.use();
         shader_texture.setUniform1i("u_sampler", 0);
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         texture0.bind(0);
         // Start with the table top.
         mat4 model(1.0f);
@@ -187,7 +187,7 @@ int main()
         model = getTranslation(ico_position) * model;
         shader_normal.use();
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         glBindVertexArray(icosahedron.vao);
         // Draw wireframe.
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -201,7 +201,7 @@ int main()
         shader_texture.use();
         shader_texture.setUniform1i("u_sampler", 0);
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         glBindVertexArray(square.vao);
         square.draw();
         texture1.unbind();
@@ -211,13 +211,13 @@ int main()
         model = getRotationX(90.0f) * getRotationZ(-90.0f) * model;
         model = getTranslation(wall_1_pos) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         square.draw();
         model = getScale(vec3(floor_depth, 0.0f, floor_width));
         model = getRotationX(-90.0f) * model;
         model = getTranslation(wall_2_pos) * model;
         shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         square.draw();
         texture2.unbind();
         // Draw chessboard.
@@ -237,7 +237,7 @@ int main()
         model = getTranslation(vec3(0.0f, table_top_y + 0.01f, 0.65f)) * model;
         shader_normal.use();
         shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_normal.setUniformMat4f("u_mat", glm::value_ptr(transf));
+        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         teapot.draw();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
