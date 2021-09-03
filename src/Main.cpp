@@ -66,9 +66,14 @@ int main()
 
     cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
 
-    // Set OpenGL constant states.
+    // Set GLFW swap interval.
     glfwSwapInterval(1);
+    // Set OpenGL constant states.
     glEnable(GL_DEPTH_TEST);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
+    //glEnable(GL_CULL_FACE);
+
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
@@ -80,7 +85,8 @@ int main()
 
     // Icosahedron.
     Mesh ico_mesh = createIcosahedron();
-    subdivide(ico_mesh);
+    const int subdivision_order = 3;
+    for (int i = 0; i < subdivision_order; ++i) subdivide(ico_mesh);
     VertexArray icosahedron(ico_mesh);
 
     // Create Teapot VertexArray.

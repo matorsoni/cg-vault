@@ -83,6 +83,9 @@ void subdivide(Mesh& mesh, bool project_onto_unit_sphere)
 
     const auto initial_index_count = mesh.indices.size();
 
+    vector<unsigned int> new_indices;
+    new_indices.reserve(4 * initial_index_count);
+
     for (int tri_index_slot = 0; tri_index_slot < initial_index_count; tri_index_slot += 3) {
         // Retrieve triangle data.
         const unsigned int index[3] = {
@@ -125,25 +128,28 @@ void subdivide(Mesh& mesh, bool project_onto_unit_sphere)
         };
 
         // Top triangle.
-        mesh.indices.push_back(index[0]);
-        mesh.indices.push_back(new_pos_index[0]);
-        mesh.indices.push_back(new_pos_index[2]);
+        new_indices.push_back(index[0]);
+        new_indices.push_back(new_pos_index[0]);
+        new_indices.push_back(new_pos_index[2]);
         // Left triangle.
-        mesh.indices.push_back(new_pos_index[0]);
-        mesh.indices.push_back(index[1]);
-        mesh.indices.push_back(new_pos_index[1]);
+        new_indices.push_back(new_pos_index[0]);
+        new_indices.push_back(index[1]);
+        new_indices.push_back(new_pos_index[1]);
         // Right triangle.
-        mesh.indices.push_back(new_pos_index[2]);
-        mesh.indices.push_back(new_pos_index[1]);
-        mesh.indices.push_back(index[2]);
+        new_indices.push_back(new_pos_index[2]);
+        new_indices.push_back(new_pos_index[1]);
+        new_indices.push_back(index[2]);
         // Middle triangle.
-        mesh.indices.push_back(new_pos_index[0]);
-        mesh.indices.push_back(new_pos_index[1]);
-        mesh.indices.push_back(new_pos_index[2]);
+        new_indices.push_back(new_pos_index[0]);
+        new_indices.push_back(new_pos_index[1]);
+        new_indices.push_back(new_pos_index[2]);
+    }
 
-        // Erase the base triangle.
-        //mesh.indices.erase(mesh.indices.begin() + tri_index_slot,
-        //                   mesh.indices.begin() + tri_index_slot + 3);
+    // Copy new indices to the mesh.
+    mesh.indices.clear();
+    mesh.indices.reserve(new_indices.size());
+    for (const auto& ind : new_indices) {
+        mesh.indices.push_back(ind);
     }
 }
 
