@@ -19,3 +19,8 @@ Mesh::Mesh(const vector<Vertex>& p_vertices,
             indices.emplace_back(ind);
     }
 }
+
+Mesh::Mesh(const vector<Vertex>& p_vertices):
+    Mesh(p_vertices, {})
+{
+}

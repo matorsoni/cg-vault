@@ -3,18 +3,23 @@
 
 #include <vector>
 
-#include "Vertex.hpp"
+#include <glm/vec3.hpp>
 
-void createCube(std::vector<Vertex>& vertices);
+#include "Mesh.hpp"
 
-void createCube(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+Mesh createCubeWithoutIndices();
 
-void createSquare(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+Mesh createCube();
 
-void createIcosahedron(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+Mesh createSquare();
 
-void createBezierPatch(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices,
-                       const std::vector<glm::vec3>& control_points, int rows, int cols, float sample_density = 1.0f);
+Mesh createIcosahedron();
+
+void createBezierPatch(Mesh& mesh,
+                       const std::vector<glm::vec3>& control_points,
+                       int rows,
+                       int cols,
+                       float sample_density = 1.0f);
 
 
 #endif  // GEOMETRY_HPP

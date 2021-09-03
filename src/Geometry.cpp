@@ -1,7 +1,7 @@
 #include "Geometry.hpp"
 
 #include <cmath>
-#include <tuple>
+#include <tuple>   // For std::tuple
 
 #include "Math.hpp"
 
@@ -72,9 +72,9 @@ static void triangulatePatch(vector<unsigned int>& indices,
 }
 
 
-void createCube(vector<Vertex>& vertices)
+Mesh createCubeWithoutIndices()
 {
-    vertices = {
+    vector<Vertex> vertices = {
         // Position                 // Normal   // Texture
         {vec3(-0.5f, -0.5f, -0.5f), vec3(0.0f), vec2(0.0f, 0.0f)},
         {vec3( 0.5f, -0.5f, -0.5f), vec3(0.0f), vec2(1.0f, 0.0f)},
@@ -118,25 +118,29 @@ void createCube(vector<Vertex>& vertices)
         {vec3(-0.5f,  0.5f,  0.5f), vec3(0.0f), vec2(0.0f, 0.0f)},
         {vec3(-0.5f,  0.5f, -0.5f), vec3(0.0f), vec2(0.0f, 1.0f)}
     };
+
+    return Mesh(vertices);
 }
 
 
-void createSquare(vector<Vertex>& vertices, vector<unsigned int>& indices)
+Mesh createSquare()
 {
-    vertices = {
+    vector<Vertex> vertices = {
         {vec3(-0.5f, 0.0f, 0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(0.0f, 0.0f)},
         {vec3(0.5f, 0.0f, 0.5f),   vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 0.0f)},
         {vec3(0.5f, 0.0f, -0.5f),  vec3(0.0f, 1.0f, 0.0f), vec2(1.0f, 1.0f)},
         {vec3(-0.5f, 0.0f, -0.5f), vec3(0.0f, 1.0f, 0.0f), vec2(0.0f, 1.0f)}
     };
 
-    indices = {
+    vector<unsigned int> indices = {
         0, 1, 2,
         2, 3, 0
     };
+
+    return Mesh(vertices, indices);
 }
 
-void createIcosahedron(vector<Vertex>& vertices, vector<unsigned int>& indices)
+Mesh createIcosahedron()
 {
     // Spherical coords with Y as up vector:
     // x = cos(phi)sin(theta)
@@ -150,6 +154,7 @@ void createIcosahedron(vector<Vertex>& vertices, vector<unsigned int>& indices)
     const float d_theta = 2*PI/5;
 
     // Add top vertice.
+    vector<Vertex> vertices;
     vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     // Add the 5 vertices below the first one.
@@ -172,7 +177,7 @@ void createIcosahedron(vector<Vertex>& vertices, vector<unsigned int>& indices)
     vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f));
 
     // Define triangles.
-    indices = {
+    vector<unsigned int> indices = {
         // Top part.
         0,1,2,  0,2,3,  0,3,4,  0,4,5,  0,5,1,
         // Middle part.
@@ -180,11 +185,16 @@ void createIcosahedron(vector<Vertex>& vertices, vector<unsigned int>& indices)
         // Bottom part.
         11,7,6,  11,8,7,  11,9,8,  11,10,9,  11,6,10
     };
+
+    return Mesh(vertices, indices);
 }
 
 
-void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
-                       const vector<vec3>& control_points, int rows, int cols, float sample_density)
+void createBezierPatch(Mesh& mesh,
+                       const vector<vec3>& control_points,
+                       int rows,
+                       int cols,
+                       float sample_density)
 {
     assert(rows >= 0);
     assert(cols >= 0);
@@ -197,7 +207,7 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     const float row_step = 1.0f / (row_samples - 1);
     const float col_step = 1.0f / (col_samples - 1);
 
-    const unsigned int initial_vertex_count = vertices.size();
+    const unsigned int initial_vertex_count = mesh.vertices.size();
 
     // Sample from Bezier surface.
     float u = 0.0f;
@@ -207,7 +217,7 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
             const auto sample = bezierSurfaceSample(control_points, rows, cols, u, v);
             const vec3 position = get<0>(sample);
             const vec3 normal = get<1>(sample);
-            vertices.emplace_back(position, normal);
+            mesh.vertices.emplace_back(position, normal);
 
             v += col_step;
         }
@@ -216,5 +226,5 @@ void createBezierPatch(vector<Vertex>& vertices, vector<unsigned int>& indices,
     }
 
     // Triangulate the sampled patch.
-    triangulatePatch(indices, row_samples, col_samples, false, false, initial_vertex_count);
+    triangulatePatch(mesh.indices, row_samples, col_samples, false, false, initial_vertex_count);
 }

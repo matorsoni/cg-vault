@@ -7,6 +7,8 @@
 
 struct Mesh
 {
+    Mesh() = default;
+    Mesh(const std::vector<Vertex>& p_vertices);
     Mesh(const std::vector<Vertex>& p_vertices,
          const std::vector<unsigned int>& p_indices);
 

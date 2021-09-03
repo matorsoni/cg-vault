@@ -1,6 +1,10 @@
 #include "Teapot.hpp"
 
+#include <vector>
+
 #include <glm/vec3.hpp>
+
+#include "Geometry.hpp"
 
 using glm::vec3;
 using namespace std;
@@ -25,8 +29,9 @@ const int PATCH_ROWS = 4;
 const int PATCH_COLS = 4;
 const int PATCH_SIZE = PATCH_ROWS * PATCH_COLS;
 
-void createTeapot(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, float density)
+Mesh createTeapot(float sample_density)
 {
+    Mesh mesh;
     const auto teapot_vertices = teapotVertices();
     const vector<TeapotParts> teapot_parts = {
         TeapotParts::RIM,
@@ -62,11 +67,19 @@ void createTeapot(std::vector<Vertex>& vertices, std::vector<unsigned int>& indi
                 control_points.emplace_back(teapot_vertices[index]);
             }
 
-            // Create the sampled bezier and append to the mesh.
-            createBezierPatch(vertices, indices, control_points, PATCH_ROWS, PATCH_COLS, density);
+            // Create the sampled bezier surface and append it to the mesh.
+            createBezierPatch(mesh,
+                              control_points,
+                              PATCH_ROWS,
+                              PATCH_COLS,
+                              sample_density);
+
+            // Clear control points for the next patch.
             control_points.clear();
         }
     }
+
+    return mesh;
 }
 
 static vector<vec3> teapotVertices()

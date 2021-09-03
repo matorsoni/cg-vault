@@ -10,6 +10,7 @@ struct VertexArray
 {
     VertexArray(const std::vector<Vertex>& p_vertices,
                 const std::vector<unsigned int>& p_indices);
+    VertexArray(const Mesh& p_mesh);
 
     void draw();
 

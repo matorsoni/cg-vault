@@ -41,6 +41,11 @@ VertexArray::VertexArray(const vector<Vertex>& p_vertices,
     glBindVertexArray(0);
 }
 
+VertexArray::VertexArray(const Mesh& p_mesh):
+    VertexArray(p_mesh.vertices, p_mesh.indices)
+{
+}
+
 void VertexArray::draw()
 {
     if (mesh.indices.empty()) {

@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Math.hpp"
+#include "Geometry.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
 #include "Texture.hpp"
@@ -72,31 +73,25 @@ int main()
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
     // Create cube VertexArray.
-    vector<Vertex> cube_vertices;
-    createCube(cube_vertices);
-    VertexArray cube(cube_vertices, {});
+    VertexArray cube(createCubeWithoutIndices());
 
     // Create square VertexArray.
-    vector<Vertex> square_vertices;
-    vector<unsigned int> square_indices;
-    createSquare(square_vertices, square_indices);
-    VertexArray square(square_vertices, square_indices);
+    VertexArray square(createSquare());
+
+    // Icosahedron.
+    VertexArray icosahedron(createIcosahedron());
 
     // Create Teapot VertexArray.
-    const float density = 2.0f;
-    vector<Vertex> teapot_vertices;
-    vector<unsigned int> teapot_indices;
-    createTeapot(teapot_vertices, teapot_indices, density);
-    VertexArray teapot(teapot_vertices, teapot_indices);
+    const float sample_density = 2.0f;
+    VertexArray teapot(createTeapot(sample_density));
 
-    // Load shader program.
-    ShaderProgram shader_texture("../src/shader/vertex.glsl", "../src/shader/fragment.glsl");
-    ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert", "../src/shader/VertexColor.frag");
+    // Load shader programs.
+    ShaderProgram shader_texture("../src/shader/vertex.glsl",
+                                 "../src/shader/fragment.glsl");
+    ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert",
+                                "../src/shader/VertexColor.frag");
 
-    // Render in wireframe mode.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // Create texture.
+    // Load textures.
     Texture texture0("../assets/wood3.jpeg");
     Texture texture1("../assets/wood1.jpeg");
     Texture texture2("../assets/black-brick2.jpg");
@@ -123,11 +118,7 @@ int main()
     const vec3 top_position = vec3(0.0f, table_height + top_girth/2, 0.0f);
     const float table_top_y = table_height + top_girth;
 
-    // Icosahedron.
-    vector<Vertex> ico_vertices;
-    vector<unsigned int> ico_indices;
-    createIcosahedron(ico_vertices, ico_indices);
-    VertexArray icosahedron(ico_vertices, ico_indices);
+    // Icosahedron position.
     vec3 ico_position{0.0f, table_top_y + 0.8f, -0.5f};
 
     // Floor and walls.
