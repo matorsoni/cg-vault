@@ -11,7 +11,6 @@
 #include "Geometry.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
-#include "Texture.hpp"
 #include "VertexArray.hpp"
 
 using namespace std;
@@ -93,17 +92,8 @@ int main()
     const float sample_density = 2.0f;
     VertexArray teapot(createTeapot(sample_density));
 
-    // Load shader programs.
-    ShaderProgram shader_texture("../src/shader/vertex.glsl",
-                                 "../src/shader/fragment.glsl");
     ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert",
                                 "../src/shader/VertexColor.frag");
-
-    // Load textures.
-    Texture texture0("../assets/wood3.jpeg");
-    Texture texture1("../assets/wood1.jpeg");
-    Texture texture2("../assets/black-brick2.jpg");
-    Texture texture3("../assets/chess.jpeg");
 
     /*** Setup the table scene. ***/
     // Table variables.
@@ -129,11 +119,6 @@ int main()
     // Icosahedron position.
     vec3 ico_position{0.0f, table_top_y + 0.8f, -0.5f};
 
-    // Floor and walls.
-    const float floor_width = 5.0f;
-    const float floor_depth = 5.0f;
-    const vec3 wall_1_pos = vec3(-floor_width/2, floor_depth/2, 0.0f);
-    const vec3 wall_2_pos = vec3(0.0f, floor_depth/2, -floor_width/2);
     // Setup camera with Y as the up direction.
     const vec3 up{0.0f, 1.0f, 0.0f};
     vec3 camera_pos{2.7f, 2.7f, 2.7f};
@@ -148,9 +133,6 @@ int main()
         glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Set vertex color via uniform.
-        float green = sin(tick) / 2.0f + 0.5f;
-
         // Create camera view matrix transform.
         mat4 view = getView(camera_pos, up, target);
         // Create projection matrix.
@@ -159,15 +141,13 @@ int main()
         mat4 transf = proj * view;
 
         // Draw table.
-        shader_texture.use();
-        shader_texture.setUniform1i("u_sampler", 0);
-        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        texture0.bind(0);
+        shader_normal.use();
+        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
         // Start with the table top.
         mat4 model(1.0f);
         model = getScale(top_scale);
         model = getTranslation(top_position) * model;
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
         glBindVertexArray(cube.vao);
         cube.draw();
         // Draw legs.
@@ -175,11 +155,10 @@ int main()
             // Create model (local -> world) matrix transformation.
             model = getScale(leg_scale);
             model = getTranslation(leg_position[i]) * model;
-            shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
 
             cube.draw();
         }
-        texture0.unbind();
 
         // Draw icosahedron.
         model = getScale(vec3(0.35f));
@@ -194,39 +173,6 @@ int main()
         icosahedron.draw();
         // Turn back to fill triangles.
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        // Draw floor.
-        texture1.bind(0);
-        model = getScale(vec3(floor_depth, 0.0f, floor_width));
-        shader_texture.use();
-        shader_texture.setUniform1i("u_sampler", 0);
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        glBindVertexArray(square.vao);
-        square.draw();
-        texture1.unbind();
-        // Draw walls.
-        texture2.bind(0);
-        model = getScale(vec3(floor_depth, 0.0f, floor_width));
-        model = getRotationX(90.0f) * getRotationZ(-90.0f) * model;
-        model = getTranslation(wall_1_pos) * model;
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        square.draw();
-        model = getScale(vec3(floor_depth, 0.0f, floor_width));
-        model = getRotationX(-90.0f) * model;
-        model = getTranslation(wall_2_pos) * model;
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_texture.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        square.draw();
-        texture2.unbind();
-        // Draw chessboard.
-        texture3.bind(0);
-        model = getScale(vec3(1.0f));
-        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, -0.5f)) * model;
-        shader_texture.setUniformMat4f("u_model", glm::value_ptr(model));
-        square.draw();
-        texture3.unbind();
 
         // Draw teapot.
         glBindVertexArray(teapot.vao);
