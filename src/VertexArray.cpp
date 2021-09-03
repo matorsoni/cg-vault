@@ -5,20 +5,19 @@
 using namespace std;
 
 VertexArray::VertexArray(const vector<Vertex>& p_vertices,
-                         const vector<unsigned int>& p_indices)
+                         const vector<unsigned int>& p_indices):
+    mesh(p_vertices, p_indices)
 {
-    // Copy vertices to the VertexArray object.
-    vertices.reserve(p_vertices.size());
-    for (const auto& v : p_vertices)
-        vertices.emplace_back(v);
-
     // Create Vertex Array Object.
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     // Populate VAO with a Vertex Buffer Object.
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,
+                 mesh.vertices.size() * sizeof(Vertex),
+                 mesh.vertices.data(),
+                 GL_STATIC_DRAW);
     // Specify vertex positions, on layout location 0.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -30,18 +29,12 @@ VertexArray::VertexArray(const vector<Vertex>& p_vertices,
     glEnableVertexAttribArray(2);
 
     // Setup Element Buffer Object if there are indices.
-    if (p_indices.size() != 0) {
-        // Copy indices to the VertexArray object.
-        indices.reserve(p_indices.size());
-        for (const auto& ind : p_indices)
-            indices.emplace_back(ind);
-
-        // Create EBO.
+    if (mesh.indices.size() != 0) {
         glGenBuffers(1, &ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     indices.size() * sizeof(unsigned int),
-                     indices.data(), GL_STATIC_DRAW);
+                     mesh.indices.size() * sizeof(unsigned int),
+                     mesh.indices.data(), GL_STATIC_DRAW);
     }
 
     // Unbind VAO.
@@ -50,10 +43,10 @@ VertexArray::VertexArray(const vector<Vertex>& p_vertices,
 
 void VertexArray::draw()
 {
-    if (indices.empty()) {
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    if (mesh.indices.empty()) {
+        glDrawArrays(GL_TRIANGLES, 0, mesh.vertices.size());
     }
     else {
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, (void*)0);
     }
 }

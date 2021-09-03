@@ -3,8 +3,9 @@
 
 #include <vector>
 
-#include "Geometry.hpp"
+#include "Mesh.hpp"
 
+// VertexArray is a wrapper for vertex array objects in OpenGL.
 struct VertexArray
 {
     VertexArray(const std::vector<Vertex>& p_vertices,
@@ -15,8 +16,7 @@ struct VertexArray
     unsigned int vao;
     unsigned int vbo;
     unsigned int ebo;
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
+    Mesh mesh;
 };
 
 

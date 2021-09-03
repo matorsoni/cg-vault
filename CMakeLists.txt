@@ -16,6 +16,7 @@ add_executable(
     src/ShaderProgram.cpp
     src/Teapot.cpp
     src/Texture.cpp
+    src/Vertex.cpp
     src/VertexArray.cpp
 )
 
