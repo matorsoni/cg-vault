@@ -13,6 +13,7 @@ add_executable(
     src/Geometry.cpp
     src/Math.cpp
     src/Mesh.cpp
+    src/SceneNode.cpp
     src/ShaderProgram.cpp
     src/Teapot.cpp
     src/Vertex.cpp

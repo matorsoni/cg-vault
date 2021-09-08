@@ -9,6 +9,7 @@
 
 #include "Math.hpp"
 #include "Geometry.hpp"
+#include "SceneNode.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
 #include "VertexArray.hpp"
@@ -94,6 +95,16 @@ int main()
 
     ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert",
                                 "../src/shader/VertexColor.frag");
+
+    // Scene node test //
+    {
+    SceneNode node;
+    node.make_subnode();
+
+    }
+
+
+
 
     /*** Setup the table scene. ***/
     // Table variables.
