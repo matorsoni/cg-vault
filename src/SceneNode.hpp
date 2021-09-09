@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 #include "VertexArray.hpp"
 
@@ -18,8 +19,12 @@ public:
     ~SceneNode();
     //SceneNode(const SceneNode& node);
 
-    // Creates a new node.
-    SceneNode* make_subnode();
+    // Create a new node.
+    SceneNode* makeSubnode();
+    //SceneNode* makeSubnode(SceneNode& node);
+
+    glm::mat4 localTransformation();
+    glm::mat4 worldTransformation();
 
     glm::vec3 pos;
     glm::vec3 ori_x, ori_y, ori_z;

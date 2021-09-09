@@ -96,17 +96,8 @@ int main()
     ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert",
                                 "../src/shader/VertexColor.frag");
 
-    // Scene node test //
-    {
-    SceneNode node;
-    node.make_subnode();
-
-    }
-
-
-
-
-    /*** Setup the table scene. ***/
+    /*** Setup the scene. ***/
+    SceneNode scene;
     // Table variables.
     const float table_width = 2.0f;
     const float table_depth = 1.0f;
@@ -114,17 +105,34 @@ int main()
     const float leg_width = 0.1f;
     const float top_girth = 0.1f;
     const float top_scale_factor = 1.1f;
-    const vec3 leg_scale = vec3(leg_width, table_height, leg_width);
-    vec3 leg_position[] = {
-        vec3(table_depth/2, table_height/2, table_width/2),
-        vec3(table_depth/2, table_height/2, -table_width/2),
-        vec3(-table_depth/2, table_height/2, -table_width/2),
-        vec3(-table_depth/2, table_height/2, table_width/2)
-    };
-    const vec3 top_scale = vec3(top_scale_factor * table_depth,
-                                top_girth,
-                                top_scale_factor * table_width);
-    const vec3 top_position = vec3(0.0f, table_height + top_girth/2, 0.0f);
+    // Table object.
+    SceneNode* table_object = scene.makeSubnode();
+    // Legs.
+    {
+        const vec3 leg_scale = vec3(leg_width, table_height, leg_width);
+        vec3 leg_position[] = {
+            vec3(table_depth/2, table_height/2, table_width/2),
+            vec3(table_depth/2, table_height/2, -table_width/2),
+            vec3(-table_depth/2, table_height/2, -table_width/2),
+            vec3(-table_depth/2, table_height/2, table_width/2)
+        };
+        for (int i = 0; i < 4; ++i) {
+            SceneNode* leg_object = table_object->makeSubnode();
+            leg_object->pos = leg_position[i];
+            leg_object->scale = leg_scale;
+            leg_object->vertex_array = &cube;
+        }
+    }
+    // Top.
+    {
+        SceneNode* top_object = table_object->makeSubnode();
+        top_object->pos = vec3(0.0f, table_height + top_girth/2, 0.0f);
+        top_object->scale = vec3(top_scale_factor * table_depth,
+                                 top_girth,
+                                 top_scale_factor * table_width);
+        top_object->vertex_array = &cube;
+    }
+
     const float table_top_y = table_height + top_girth;
 
     // Icosahedron position.
@@ -154,24 +162,16 @@ int main()
         // Draw table.
         shader_normal.use();
         shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        // Start with the table top.
-        mat4 model(1.0f);
-        model = getScale(top_scale);
-        model = getTranslation(top_position) * model;
-        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        glBindVertexArray(cube.vao);
-        cube.draw();
-        // Draw legs.
-        for (int i = 0; i < 4; ++i) {
-            // Create model (local -> world) matrix transformation.
-            model = getScale(leg_scale);
-            model = getTranslation(leg_position[i]) * model;
+        for (int i = 0; i < table_object->subnodes.size(); ++i) {
+            auto* node = table_object->subnodes[i].get();
+            auto model = node->worldTransformation();
             shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-
-            cube.draw();
+            glBindVertexArray(node->vertex_array->vao);
+            node->vertex_array->draw();
         }
 
         // Draw icosahedron.
+        mat4 model(1.0f);
         model = getScale(vec3(0.35f));
         model = getRotationY(50 * tick) * model;
         model = getTranslation(ico_position) * model;
