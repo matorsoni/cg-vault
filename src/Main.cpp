@@ -135,8 +135,19 @@ int main()
 
     const float table_top_y = table_height + top_girth;
 
-    // Icosahedron position.
-    vec3 ico_position{0.0f, table_top_y + 0.8f, -0.5f};
+    // Icosahedron object.
+    SceneNode* ico_object = scene.makeSubnode();
+    ico_object->pos = vec3{0.0f, table_top_y + 0.8f, -0.5f};
+    ico_object->scale = vec3(0.35f);
+    ico_object->vertex_array = &icosahedron;
+
+    // Teapot object.
+    SceneNode* teapot_object = scene.makeSubnode();
+    teapot_object->pos = vec3(0.0f, table_top_y + 0.01f, 0.65f);
+    teapot_object->ori_y = vec3(0.0f, 0.0f, -1.0f);
+    teapot_object->ori_z = cross(teapot_object->ori_x, teapot_object->ori_y);
+    teapot_object->scale = vec3(0.2f);
+    teapot_object->vertex_array = &teapot;
 
     // Setup camera with Y as the up direction.
     const vec3 up{0.0f, 1.0f, 0.0f};
@@ -159,9 +170,10 @@ int main()
         // Final transformation.
         mat4 transf = proj * view;
 
-        // Draw table.
         shader_normal.use();
         shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
+
+        // Draw table.
         for (int i = 0; i < table_object->subnodes.size(); ++i) {
             auto* node = table_object->subnodes[i].get();
             auto model = node->worldTransformation();
@@ -171,33 +183,23 @@ int main()
         }
 
         // Draw icosahedron.
-        mat4 model(1.0f);
-        model = getScale(vec3(0.35f));
-        model = getRotationY(50 * tick) * model;
-        model = getTranslation(ico_position) * model;
-        shader_normal.use();
-        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        glBindVertexArray(icosahedron.vao);
-        // Draw wireframe.
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        icosahedron.draw();
-        // Turn back to fill triangles.
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        {
+            auto model = ico_object->worldTransformation();
+            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(ico_object->vertex_array->vao);
+            // Draw wireframe and then turn back to fill triangles.
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            ico_object->vertex_array->draw();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         // Draw teapot.
-        glBindVertexArray(teapot.vao);
-        model = mat4(1.0f);
-        model = getScale({0.2f, 0.2f, 0.2f}) * model;
-        model = getRotationX(-90) * model;
-        model = getRotationY(50 * tick) * model;
-        model = getTranslation(vec3(0.0f, table_top_y + 0.01f, 0.65f)) * model;
-        shader_normal.use();
-        shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        teapot.draw();
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        {
+            auto model = teapot_object->worldTransformation();
+            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(teapot_object->vertex_array->vao);
+            teapot_object->vertex_array->draw();
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
