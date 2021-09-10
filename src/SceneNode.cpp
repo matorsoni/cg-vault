@@ -41,25 +41,6 @@ SceneNode* SceneNode::makeSubnode()
     return new_node;
 }
 
-//SceneNode* SceneNode::makeSubnode(SceneNode& node)
-//{
-//    subnodes.emplace_back(new SceneNode);
-//    SceneNode* new_node = subnodes.back().get();
-//
-//    // Copy node data.
-//    new_node->pos = node.pos;
-//    new_node->ori_x = node.ori_x;
-//    new_node->ori_y = node.ori_y;
-//    new_node->ori_z = node.ori_z;
-//    new_node->scale = node.scale;
-//    new_node->parent_node = this;
-//    new_node->vertex_array = node.vertex_array;
-//    // Mode subnodes.
-//    new_node->subnodes = move(node.subnodes);
-//
-//    return new_node;
-//}
-
 mat4 SceneNode::localTransformation()
 {
     return getTranslation(pos) * getRotation(ori_x, ori_y, ori_z) * getScale(scale);

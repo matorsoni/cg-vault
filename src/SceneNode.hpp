@@ -17,11 +17,9 @@ public:
     SceneNode();
     SceneNode(VertexArray* vao);
     ~SceneNode();
-    //SceneNode(const SceneNode& node);
 
     // Create a new node.
     SceneNode* makeSubnode();
-    //SceneNode* makeSubnode(SceneNode& node);
 
     glm::mat4 localTransformation();
     glm::mat4 worldTransformation();

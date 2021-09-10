@@ -166,13 +166,6 @@ int main()
     {
         processInput(window);
 
-        // Process arcball motion.
-        arcball.processInput(window);
-        const mat4 arc_rotation = arcball.getArcRotation();
-        scene.ori_x = arc_rotation[0];
-        scene.ori_y = arc_rotation[1];
-        scene.ori_z = arc_rotation[2];
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Create camera view matrix transform.
@@ -181,6 +174,17 @@ int main()
         mat4 proj = glm::perspective(glm::radians(45.0f), aspect_ratio, 0.1f, 100.0f);
         // Final transformation.
         mat4 transf = proj * view;
+
+        // Process arcball motion.
+        arcball.processInput(window);
+        // Transform camera space rotation to world space rotation.
+        // This is probably not correct...
+        // Check https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
+        const mat4 arc_rotation = glm::inverse(view) * arcball.getArcRotation();
+        // Move the scene accordingly.
+        scene.ori_x = arc_rotation[0];
+        scene.ori_y = arc_rotation[1];
+        scene.ori_z = arc_rotation[2];
 
         shader_normal.use();
         shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(transf));

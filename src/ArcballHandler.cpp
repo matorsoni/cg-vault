@@ -66,7 +66,7 @@ void ArcballHandler::processInput(GLFWwindow* window)
                                                            ypos,
                                                            screen_width_,
                                                            screen_height_);
-        //cout << sphere_pos_start_.x << " " << sphere_pos_start_.y <<  " " << sphere_pos_start_.z << endl;
+
         if (is_active_) {
             // Update transformation.
             curr_rotation_ = rotationFromSpherePositions(sphere_pos, sphere_pos_start_);
