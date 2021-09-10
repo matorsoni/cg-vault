@@ -13,8 +13,8 @@ using namespace std;
 
 mat4 getRotationX(float angle)
 {
-    float s = sin(radians(angle));
-    float c = cos(radians(angle));
+    const float s = sin(angle);
+    const float c = cos(angle);
     // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
     return mat4(
         1, 0, 0, 0,
@@ -26,8 +26,8 @@ mat4 getRotationX(float angle)
 
 mat4 getRotationY(float angle)
 {
-    float s = sin(radians(angle));
-    float c = cos(radians(angle));
+    const float s = sin(angle);
+    const float c = cos(angle);
     // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
     return mat4(
         c, 0, -s, 0,
@@ -39,8 +39,8 @@ mat4 getRotationY(float angle)
 
 mat4 getRotationZ(float angle)
 {
-    float s = sin(radians(angle));
-    float c = cos(radians(angle));
+    const float s = sin(angle);
+    const float c = cos(angle);
     // GLM defines matrices as (col0x, col0y, col0z, col0w, ...), always remeber it's transposed.
     return mat4(
         c, s, 0, 0,
@@ -58,6 +58,32 @@ mat4 getRotation(const vec3& ori_x,
                 vec4(glm::normalize(ori_y), 0.0f),
                 vec4(glm::normalize(ori_z), 0.0f),
                 vec4(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+// Ref: http://courses.cms.caltech.edu/cs171/assignments/hw3/hw3-notes/notes-hw3.html
+mat4 getRotation(const vec3& axis, float angle)
+{
+    const float x = axis.x;
+    const float y = axis.y;
+    const float z = axis.z;
+    const float c = cosf(angle);
+    const float s = sinf(angle);
+
+    const float x2 = x * x;
+    const float y2 = y * y;
+    const float z2 = z * z;
+    const float xy = x * y;
+    const float xz = x * z;
+    const float yz = y * z;
+
+    const float inv_cos = 1.0f - c;
+
+    return mat4(
+        vec4(x2 + (1.f-x2)*c, xy*inv_cos + z*s, xz*inv_cos - y*s, 0.0f),
+        vec4(xy*inv_cos - z*s, y2 + (1.f-y2)*c, yz*inv_cos + x*s, 0.0f),
+        vec4(xz*inv_cos + y*s, yz*inv_cos - x*s, z2 + (1.f-z2)*c, 0.0f),
+        vec4(0.0f, 0.0f, 0.0f, 1.0f)
+    );
 }
 
 mat4 getScale(const vec3& u)

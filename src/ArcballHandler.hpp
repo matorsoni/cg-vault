@@ -13,15 +13,17 @@ public:
 
     void processInput(GLFWwindow* window);
 
-    const glm::mat4& getArcRotation() const;
+    glm::mat4 getArcRotation() const;
 
 private:
 
     const int screen_width_;
     const int screen_height_;
     bool is_active_;
-    glm::vec3 sphere_pos_;
-    glm::mat4 arc_rotation_;
+    glm::vec3 sphere_pos_start_;
+    // Current and last rotation matrices.
+    glm::mat4 last_rotation_;
+    glm::mat4 curr_rotation_;
 };
 
 

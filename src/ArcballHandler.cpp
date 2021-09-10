@@ -1,10 +1,13 @@
 #include "ArcballHandler.hpp"
 
+#include <algorithm>   // for std::min
 #include <cmath>
 //#include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+
+#include "Math.hpp"   // for getRotation
 
 using namespace std;
 using glm::mat4;
@@ -25,12 +28,18 @@ static vec3 spherePositionFromScreenPosition(double xpos, double ypos, int width
 
 static mat4 rotationFromSpherePositions(const vec3& v1, const vec3& v2)
 {
-    const vec3 normal = glm::normalize(glm::cross(v1, v2));
-    const float angle = glm::angle(v1, v2);
+    // v1 and v2 are supposed to be normalized.
+    // Compute normal vector that is orthogonal to v1 and v2.
+    vec3 normal = glm::cross(v1, v2);
+    if (glm::length(normal) < 0.0001f) {
+        return mat4(1.0f);
+    }
+    normal = glm::normalize(normal);
 
-    mat4 rot{1.0f};
-    rot = glm::rotate(rot, angle, normal);
-    return rot;
+    // Angle between v1 and v2, in radians. Use min to prevent float imprecisions (ex: 1.0001f).
+    const float angle = acos(min(1.0f, glm::dot(v1, v2)));
+
+    return getRotation(normal, angle);
 }
 
 // ArcballHandler implementation.
@@ -38,8 +47,9 @@ ArcballHandler::ArcballHandler(int screen_width, int screen_height):
     screen_width_(screen_width),
     screen_height_(screen_height),
     is_active_(false),
-    sphere_pos_(vec3(0.0f, 0.0f, 1.0f)),
-    arc_rotation_(mat4(1.0f))
+    sphere_pos_start_(vec3(0.0f, 0.0f, 1.0f)),
+    last_rotation_(mat4(1.0f)),
+    curr_rotation_(mat4(1.0f))
 {
 }
 
@@ -51,17 +61,20 @@ void ArcballHandler::processInput(GLFWwindow* window)
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
 
-        // Save previous sphere position and update it.
-        vec3 prev_sphere_pos = sphere_pos_;
-        sphere_pos_ = spherePositionFromScreenPosition(xpos, ypos, screen_width_, screen_height_);
-        //cout << sphere_pos_.x << " " << sphere_pos_.y <<  " " << sphere_pos_.z << endl;
+        // Compute current sphere position.
+        vec3 sphere_pos = spherePositionFromScreenPosition(xpos,
+                                                           ypos,
+                                                           screen_width_,
+                                                           screen_height_);
+        //cout << sphere_pos_start_.x << " " << sphere_pos_start_.y <<  " " << sphere_pos_start_.z << endl;
         if (is_active_) {
             // Update transformation.
-            arc_rotation_ = rotationFromSpherePositions(prev_sphere_pos, sphere_pos_);
+            curr_rotation_ = rotationFromSpherePositions(sphere_pos, sphere_pos_start_);
         }
         else {
-            // Activate.
+            // Activate and save initial sphere position.
             is_active_ = true;
+            sphere_pos_start_ = sphere_pos;
         }
     }
     else {
@@ -69,13 +82,14 @@ void ArcballHandler::processInput(GLFWwindow* window)
         if (is_active_) {
             // Reset and deactivate.
             is_active_ = false;
-            sphere_pos_ = vec3(0.0f, 0.0f, 1.0f);
-            arc_rotation_ = mat4(1.0f);
+            sphere_pos_start_ = vec3(0.0f, 0.0f, 1.0f);
+            last_rotation_ = curr_rotation_ * last_rotation_;
+            curr_rotation_ = mat4(1.0f);
         }
     }
 }
 
-const mat4& ArcballHandler::getArcRotation() const
+mat4 ArcballHandler::getArcRotation() const
 {
-    return arc_rotation_;
+    return curr_rotation_ * last_rotation_;
 }

@@ -14,6 +14,8 @@ glm::mat4 getRotationZ(float angle);
 glm::mat4 getRotation(const glm::vec3& ori_x,
                       const glm::vec3& ori_y,
                       const glm::vec3& ori_z);
+// Rotation about an axis. Inputs are a normalized axis and an angle in radians.
+glm::mat4 getRotation(const glm::vec3& axis, float angle);
 
 // Create scaling matrix.
 glm::mat4 getScale(const glm::vec3& u);

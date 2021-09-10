@@ -156,6 +156,7 @@ int main()
     vec3 camera_pos{2.7f, 2.7f, 2.7f};
     vec3 target{0.0f, table_top_y, 0.0f};
 
+
     // Setup Arcball handler.
     ArcballHandler arcball(window_width, window_height);
 
@@ -168,9 +169,9 @@ int main()
         // Process arcball motion.
         arcball.processInput(window);
         const mat4 arc_rotation = arcball.getArcRotation();
-        scene.ori_x = arc_rotation * vec4(scene.ori_x, 0.0f);
-        scene.ori_y = arc_rotation * vec4(scene.ori_y, 0.0f);
-        scene.ori_z = arc_rotation * vec4(scene.ori_z, 0.0f);
+        scene.ori_x = arc_rotation[0];
+        scene.ori_y = arc_rotation[1];
+        scene.ori_z = arc_rotation[2];
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
