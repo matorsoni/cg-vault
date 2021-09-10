@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "ArcballHandler.hpp"
 #include "Math.hpp"
 #include "Geometry.hpp"
 #include "SceneNode.hpp"
@@ -69,6 +70,7 @@ int main()
     // Set GLFW swap interval.
     glfwSwapInterval(1);
     // Set OpenGL constant states.
+    glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
@@ -154,13 +156,22 @@ int main()
     vec3 camera_pos{2.7f, 2.7f, 2.7f};
     vec3 target{0.0f, table_top_y, 0.0f};
 
+    // Setup Arcball handler.
+    ArcballHandler arcball(window_width, window_height);
+
     // Main loop.
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
 
-        glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
+        // Process arcball motion.
+        arcball.processInput(window);
+        const mat4 arc_rotation = arcball.getArcRotation();
+        scene.ori_x = arc_rotation * vec4(scene.ori_x, 0.0f);
+        scene.ori_y = arc_rotation * vec4(scene.ori_y, 0.0f);
+        scene.ori_z = arc_rotation * vec4(scene.ori_z, 0.0f);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Create camera view matrix transform.

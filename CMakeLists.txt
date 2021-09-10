@@ -10,6 +10,7 @@ add_executable(
     demo
     deps/glad/src/glad.c
     src/Main.cpp
+    src/ArcballHandler.cpp
     src/Geometry.cpp
     src/Math.cpp
     src/Mesh.cpp
