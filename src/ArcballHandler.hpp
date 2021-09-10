@@ -2,7 +2,7 @@
 #define ARCBALL_HANDLER_HPP
 
 #include <GLFW/glfw3.h>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
 
 // ArcballHandler implements the Arcball interation from mouse input.
 class ArcballHandler
@@ -17,15 +17,10 @@ public:
 
 private:
 
-    void activate();
-    void update();
-    void deactivate();
-
     const int screen_width_;
     const int screen_height_;
     bool is_active_;
-    int cursor_x_;
-    int cursor_y_;
+    glm::vec3 sphere_pos_;
     glm::mat4 arc_rotation_;
 };
 
