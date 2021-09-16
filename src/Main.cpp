@@ -29,10 +29,12 @@ static void error_callback(int error, const char* description)
 }
 
 // Process input with GLFW.
-static void processInput(GLFWwindow* window)
+static void processInput(GLFWwindow* window, Camera& camera)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        camera.changeProjection();
 }
 
 
@@ -164,7 +166,7 @@ int main()
     double tick = glfwGetTime(), tock;
     while (!glfwWindowShouldClose(window))
     {
-        processInput(window);
+        processInput(window, camera);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

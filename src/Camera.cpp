@@ -21,9 +21,13 @@ Camera::Camera(int screen_width, int screen_height):
     const float fov_y = glm::radians(45.0f);
     const float near_plane = 0.1f;
     const float far_plane = 100.0f;
+    const float ortho_factor = 2.0f;
 
     // Build projection matrices.
     perspective_projection_ = glm::perspective(fov_y, aspect_ratio, near_plane, far_plane);
+    parallel_projection_ = glm::ortho(-aspect_ratio * ortho_factor, aspect_ratio * ortho_factor,
+                                      -ortho_factor, ortho_factor,
+                                      near_plane, far_plane);
 }
 
 vec3& Camera::position()
