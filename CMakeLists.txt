@@ -11,6 +11,7 @@ add_executable(
     deps/glad/src/glad.c
     src/Main.cpp
     src/ArcballHandler.cpp
+    src/Camera.cpp
     src/Geometry.cpp
     src/Math.cpp
     src/Mesh.cpp

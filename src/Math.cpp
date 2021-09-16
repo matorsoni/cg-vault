@@ -106,30 +106,6 @@ mat4 getTranslation(const vec3& u)
     return trans;
 }
 
-
-mat4 getView(const vec3& camera_pos, const vec3& up, const vec3& target)
-{
-    // View matrix is the inverse of:
-    // | .  | .  | .  | .  | -1          | .  | Ex | .  | 0  |     | 1  | 0  | 0  | .  |
-    // | Ex | Ey | Ez | P  |      =      | .  | Ey | .  | 0  |  *  | 0  | 1  | 0  | -P |
-    // | .  | .  | .  | .  |             | .  | Ez | .  | 0  |     | 0  | 0  | 1  | .  |
-    // | 0  | 0  | 0  | 1  |             | 0  | 0  | 0  | 1  |     | 0  | 0  | 0  | 1  |
-    // Ex, Ey and Ex being the X, Y, Z unit vectors of the camera's frame.
-
-    vec3 Ez = normalize(camera_pos - target);
-    vec3 Ex = normalize(cross(up, Ez));
-    vec3 Ey = cross(Ez, Ex);
-
-    mat4 inv_rotation = transpose(
-        mat4{vec4(Ex, 0.0f), vec4(Ey, 0.0f), vec4(Ez, 0.0f), vec4(0.0f, 0.0f, 0.0f, 1.0f)}
-    );
-    mat4 inv_translation = mat4(1.0f);
-    inv_translation[3] = vec4(-camera_pos, 1.0f);
-
-    return inv_rotation * inv_translation;
-}
-
-
 uint64_t factorial(int n)
 {
     assert(n >= 0);
