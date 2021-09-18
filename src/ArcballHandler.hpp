@@ -5,6 +5,30 @@
 #include <glm/glm.hpp>
 
 // ArcballHandler implements the Arcball interation from mouse input.
+// Check https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
+//
+// Example of usage:
+
+// // Setup Arcball handler.
+// ArcballHandler arcball(window_width, window_height);
+//
+// // Main loop.
+// while (!glfwWindowShouldClose(window))
+// {
+//      ...
+//
+//      // Process arcball motion.
+//      arcball.processInput(window);
+//
+//      // Transform camera space rotation to world space rotation.
+//      const mat4 arc_rotation = glm::inverse(camera.view()) * arcball.getArcRotation();
+//
+//      // Move the scene accordingly.
+//      scene.ori_x = arc_rotation[0];
+//      scene.ori_y = arc_rotation[1];
+//      scene.ori_z = arc_rotation[2];
+// }
+
 class ArcballHandler
 {
 public:

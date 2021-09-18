@@ -69,7 +69,7 @@ void ArcballHandler::processInput(GLFWwindow* window)
 
         if (is_active_) {
             // Update transformation.
-            curr_rotation_ = rotationFromSpherePositions(sphere_pos, sphere_pos_start_);
+            curr_rotation_ = rotationFromSpherePositions(sphere_pos_start_, sphere_pos);
         }
         else {
             // Activate and save initial sphere position.

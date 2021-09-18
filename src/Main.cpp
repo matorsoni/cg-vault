@@ -176,8 +176,6 @@ int main()
         // Process arcball motion.
         arcball.processInput(window);
         // Transform camera space rotation to world space rotation.
-        // This is probably not correct...
-        // Check https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball
         const mat4 arc_rotation = glm::inverse(camera.view()) * arcball.getArcRotation();
         // Move the scene accordingly.
         scene.ori_x = arc_rotation[0];
