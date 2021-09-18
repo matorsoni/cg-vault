@@ -53,6 +53,7 @@ int main()
     // Set minimum OpenGL version expected by the context.
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Demo", NULL, NULL);
     if (!window) {
@@ -68,7 +69,11 @@ int main()
         return -1;
     }
 
+    // Print useful info.
     cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
+    cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+    cout << "OpenGL renderer: " << glGetString(GL_RENDERER) << endl;
+    cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl;
 
     // Set GLFW swap interval.
     glfwSwapInterval(1);
