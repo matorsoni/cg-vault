@@ -25,7 +25,8 @@ public:
     // Update camera orientation to follow the target.
     void lookAt(const glm::vec3& target);
 
-    // Alternate projection.
+    // Change projection type.
+    void isPerspective(bool is_perspective);
     void changeProjection();
 
 private:

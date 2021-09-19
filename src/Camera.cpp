@@ -77,6 +77,11 @@ void Camera::lookAt(const vec3& target)
     assert(orientation_[3] == vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
+void Camera::isPerspective(bool is_perspective)
+{
+    is_perspective_ = is_perspective;
+}
+
 void Camera::changeProjection()
 {
     is_perspective_ = !is_perspective_;
