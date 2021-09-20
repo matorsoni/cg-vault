@@ -1,8 +1,9 @@
 #ifndef ARCBALL_HANDLER_HPP
 #define ARCBALL_HANDLER_HPP
 
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+
+struct GLFWwindow;
 
 // ArcballHandler implements the Arcball interation from mouse input.
 // Check https://en.wikibooks.org/wiki/OpenGL_Programming/Modern_OpenGL_Tutorial_Arcball

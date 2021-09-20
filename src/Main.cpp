@@ -88,10 +88,6 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    // Setup ImGui and GUI state.
-    setupImGui(window);
-    GuiState gui_state;
-
     // Create cube VertexArray.
     VertexArray cube(createCubeWithoutIndices());
 
@@ -171,6 +167,10 @@ int main()
 
     // Setup Arcball handler.
     ArcballHandler arcball(window_width, window_height);
+
+    // Setup ImGui and GUI state.
+    setupImGui(window);
+    GuiState gui_state;
 
     // Main loop.
     double tick = glfwGetTime();

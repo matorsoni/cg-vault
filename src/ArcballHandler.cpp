@@ -2,10 +2,10 @@
 
 #include <algorithm>   // for std::min
 #include <cmath>
-//#include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <GLFW/glfw3.h>
 
 #include "Math.hpp"   // for getRotation
 
@@ -17,13 +17,21 @@ static vec3 spherePositionFromScreenPosition(double xpos, double ypos, int width
 {
     // Convert to normalized display coordinates:
     // -1.0f <= x,y <= 1.0f
-    float x = 2.0f * static_cast<float>(xpos / width) - 1.0f;
-    float y = 1.0f - 2.0f * static_cast<float>(ypos / height);
+    vec3 p{
+        2.0f * static_cast<float>(xpos / width) - 1.0f,
+        1.0f - 2.0f * static_cast<float>(ypos / height),
+        0.0f
+    };
 
-    // Compute z if the point lies within the centered sphere with radius 1.
-    float xy_radius2 = x*x + y*y;
-    float z = xy_radius2 < 1.0f ? sqrt(1.0f - xy_radius2) : 0.0f;
-    return vec3(x, y, z);
+    // Check if the point lies within the centered sphere with radius 1.
+    float xy_radius2 = p.x * p.x + p.y * p.y;
+    if (xy_radius2 <= 1.0f)
+        // Compute z coordinate on the sphere.
+        p.z = sqrt(1.0f - xy_radius2);
+    else
+        // Nearest point on the sphere.
+        p = glm::normalize(p);
+    return p;
 }
 
 static mat4 rotationFromSpherePositions(const vec3& v1, const vec3& v2)
