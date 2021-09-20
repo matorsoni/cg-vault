@@ -30,6 +30,7 @@ add_executable(
     src/Math.cpp
     src/Mesh.cpp
     src/SceneNode.cpp
+    src/SimpleGui.cpp
     src/ShaderProgram.cpp
     src/Teapot.cpp
     src/Vertex.cpp

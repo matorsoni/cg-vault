@@ -2,11 +2,6 @@
 #include <iostream>
 #include <vector>
 
-// ImGui includes.
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 // OpenGL (via Glad) + GLFW includes.
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -18,6 +13,7 @@
 #include "Math.hpp"
 #include "Geometry.hpp"
 #include "SceneNode.hpp"
+#include "SimpleGui.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
 #include "VertexArray.hpp"
@@ -92,18 +88,9 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    // Setup Dear ImGui context.
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    // Setup Dear ImGui style.
-    ImGui::StyleColorsDark();
-    // Setup Platform/Renderer backends.
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    const char* glsl_version = "#version 130";
-    ImGui_ImplOpenGL3_Init(glsl_version);
-
-    // ImGui state.
-    bool is_perspective = true;
+    // Setup ImGui and GUI state.
+    setupImGui(window);
+    GuiState gui_state;
 
     // Create cube VertexArray.
     VertexArray cube(createCubeWithoutIndices());
@@ -193,39 +180,20 @@ int main()
         // Get time per frame (ms) and FPS.
         tock = glfwGetTime();
         auto time_per_frame = 1000.0 * (tock - tick);
-        auto fps = 1000.0 / time_per_frame;
+        gui_state.time_per_frame = time_per_frame;
         tick = tock;
 
         glfwPollEvents();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Start the Dear ImGui frame.
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // ImGui: use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            // Create a window and add elements into it.
-            ImGui::Begin("Options");
-
-            ImGui::Checkbox("Perspective projection", &is_perspective);
-            ImGui::Text("Average time per frame: %.3f ms (%.1f FPS)", time_per_frame, fps);
-
-            ImGui::End();
-        }
-
-        // ImGui rendering.
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // Create GUI frame and render it.
+        setupGuiFrame(gui_state);
+        renderGui();
 
         // GLFW input handling.
         processInput(window, camera);
-        camera.isPerspective(is_perspective);
+        camera.isPerspective(gui_state.is_perspective);
 
         // Create camera view-projection matrix transform.
         mat4 view_projection = camera.projection() * camera.view();
@@ -274,9 +242,7 @@ int main()
     }
 
     // ImGui cleanup.
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    terminateImGui();
 
     // GLFW cleanup.
     glfwDestroyWindow(window);
