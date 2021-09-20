@@ -187,9 +187,8 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Create GUI frame and render it.
+        // Create GUI frame.
         setupGuiFrame(gui_state);
-        renderGui();
 
         // GLFW input handling.
         processInput(window, camera);
@@ -237,6 +236,9 @@ int main()
             glBindVertexArray(teapot_object->vertex_array->vao);
             teapot_object->vertex_array->draw();
         }
+
+        // Render GUI on top.
+        renderGui();
 
         glfwSwapBuffers(window);
     }

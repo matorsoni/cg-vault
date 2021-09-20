@@ -5,7 +5,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <GLFW/glfw3.h>
+// GLFW include apparently not needed since we are not using any of its methods.
+//#include <GLFW/glfw3.h>
 
 void setupImGui(GLFWwindow* window)
 {
