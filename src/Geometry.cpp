@@ -12,6 +12,8 @@ using glm::vec2;
 using glm::vec3;
 using glm::normalize;
 
+static constexpr float PI = 3.14159f;
+
 // Generate triangle indices for a rectangular patch and append it to the input indicex list.
 static void triangulatePatch(vector<unsigned int>& indices,
                              int rows,
@@ -231,7 +233,6 @@ Mesh createIcosahedron()
 
     // Elevation from xz plane in degrees.
     // phi = arctan(0.5);
-    const float PI = 3.14159f;
     const float phi = atanf(0.5f);
     const float d_theta = 2*PI/5;
 
@@ -267,6 +268,47 @@ Mesh createIcosahedron()
         // Bottom part.
         11,7,6,  11,8,7,  11,9,8,  11,10,9,  11,6,10
     };
+
+    return Mesh(vertices, indices);
+}
+
+
+Mesh createTorus(float radius_a, float radius_b)
+{
+    assert(radius_a >= 0.0f);
+    assert(radius_b >= 0.0f);
+
+    const int num_samples_u = 30;
+    const int num_samples_v = 20;
+    const float step_u = 1.0f / num_samples_u;
+    const float step_v = 1.0f / num_samples_v;
+
+    vector<Vertex> vertices;
+    for (int j = 0; j < num_samples_v; ++j) {
+        for (int i = 0; i < num_samples_u; ++i) {
+            const float theta = i * step_u * 2 * PI;
+            const float phi   = j * step_v * 2 * PI;
+            const float cos_theta = cosf(theta);
+            const float sin_theta = sin(theta);
+            const float cos_phi   = cosf(phi);
+            const float sin_phi   = sinf(phi);
+
+            // Compute torus position.
+            const float pos_x = (radius_a + radius_b * cos_phi) * sin_theta;
+            const float pos_y = radius_b * sin_phi;
+            const float pos_z = (radius_a + radius_b * cos_phi) * cos_theta;
+
+            // Compute normal vector.
+            const float n_x = cos_phi * sin_theta;
+            const float n_y = sin_theta;
+            const float n_z = cos_phi * cos_theta;
+
+            vertices.emplace_back(vec3{pos_x, pos_y, pos_z}, vec3{n_x, n_y, n_z});
+        }
+    }
+
+    vector<unsigned int> indices;
+    triangulatePatch(indices, num_samples_v, num_samples_u, true, true);
 
     return Mesh(vertices, indices);
 }

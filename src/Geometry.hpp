@@ -17,6 +17,8 @@ Mesh createSquare();
 
 Mesh createIcosahedron();
 
+Mesh createTorus(float radius_a, float radius_b);
+
 Mesh createBezierPatch(const std::vector<glm::vec3>& control_points,
                        int rows,
                        int cols,

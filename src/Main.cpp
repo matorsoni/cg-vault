@@ -108,11 +108,15 @@ int main()
     // Create square VertexArray.
     VertexArray square(createSquare());
 
-    // Icosahedron.
+    // Create icosahedron VertexArray.
     Mesh ico_mesh = createIcosahedron();
     const int subdivision_order = 3;
     for (int i = 0; i < subdivision_order; ++i) subdivide(ico_mesh);
     VertexArray icosahedron(ico_mesh);
+
+    // Create torus VertexArray.
+    Mesh torus_mesh = createTorus(1.0f, 0.15f);
+    VertexArray torus(torus_mesh);
 
     // Create Teapot VertexArray.
     const float sample_density = 2.0f;
@@ -165,6 +169,12 @@ int main()
     ico_object->pos = vec3{0.0f, table_top_y + 0.8f, -0.5f};
     ico_object->scale = vec3(0.35f);
     ico_object->vertex_array = &icosahedron;
+
+    // Torus object.
+    SceneNode* torus_object = scene.makeSubnode();
+    torus_object->pos = ico_object->pos;
+    torus_object->scale = vec3(0.5f);
+    torus_object->vertex_array = &torus;
 
     // Teapot object.
     SceneNode* teapot_object = scene.makeSubnode();
@@ -244,6 +254,17 @@ int main()
             // Draw wireframe and then turn back to fill triangles.
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             ico_object->vertex_array->draw();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
+        // Draw torus.
+        {
+            auto model = torus_object->worldTransformation();
+            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(torus_object->vertex_array->vao);
+            // Draw wireframe and then turn back to fill triangles.
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            torus_object->vertex_array->draw();
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
