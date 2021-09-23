@@ -30,15 +30,25 @@ static void error_callback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-// Process input with GLFW.
-static void processInput(GLFWwindow* window, Camera& camera)
+// Simple global place holder for variables changed by user input.
+struct InputVariables
+{
+    float clip_plane_w = 0.0f;
+};
+InputVariables input;
+
+void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    static float factor = 0.05f;
+    input.clip_plane_w += static_cast<float>(yoffset) * factor;
+}
+
+// Directly process input with GLFW.
+static void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-
-    // Process camera inputs...
 }
-
 
 // Main function.
 int main()
@@ -71,6 +81,9 @@ int main()
         return -1;
     }
 
+    // Set GFLW callback functions.
+    glfwSetScrollCallback(window, glfw_scroll_callback);
+
     // Print useful info.
     cout << "OpenGL version " << glGetString(GL_VERSION) << endl;
     cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
@@ -82,6 +95,7 @@ int main()
     // Set OpenGL constant states.
     glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CLIP_PLANE0);
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
     //glEnable(GL_CULL_FACE);
@@ -104,7 +118,7 @@ int main()
     const float sample_density = 2.0f;
     VertexArray teapot(createTeapot(sample_density));
 
-    ShaderProgram shader_normal("../src/shader/VertexColorFromNormal.vert",
+    ShaderProgram shader_normal("../src/shader/ClippingPlane.vert",
                                 "../src/shader/VertexColor.frag");
 
     /*** Setup the scene. ***/
@@ -191,7 +205,7 @@ int main()
         setupGuiFrame(gui_state);
 
         // GLFW input handling.
-        processInput(window, camera);
+        processInput(window);
         camera.isPerspective(gui_state.is_perspective);
 
         // Create camera view-projection matrix transform.
@@ -208,6 +222,10 @@ int main()
 
         shader_normal.use();
         shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
+
+        // Define clipping plane.
+        vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
+        shader_normal.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
 
         // Draw table.
         for (int i = 0; i < table_object->subnodes.size(); ++i) {
