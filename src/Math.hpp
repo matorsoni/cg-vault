@@ -7,6 +7,13 @@
 
 #include <glm/glm.hpp>
 
+// Linear interpolation.
+template <typename T>
+T Lerp(const T& a, const T& b, float t)
+{
+    return (1.0f - t) * a + t * b;
+}
+
 // Create rotation matrix.
 glm::mat4 getRotationX(float angle);
 glm::mat4 getRotationY(float angle);
