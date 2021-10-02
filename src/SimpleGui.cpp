@@ -36,6 +36,7 @@ void setupGuiFrame(GuiState& gui_state)
         ImGui::Begin("Options");
 
         ImGui::Text("System input:");
+        ImGui::Text("- WASD keys to move the camera.");
         ImGui::Text("- Scroll to control clip plane.");
         ImGui::Text("- Click and drag to rotate the scene.");
         ImGui::Text("\n");

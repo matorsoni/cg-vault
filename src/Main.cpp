@@ -44,10 +44,21 @@ void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // Directly process input with GLFW.
-static void processInput(GLFWwindow* window)
+static void processInput(GLFWwindow* window, Camera& camera)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+    // Process camera movement.
+    static const float camera_speed = 0.1f;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.position() -= camera_speed * vec3(camera.orientation()[2]);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.position() += camera_speed * vec3(camera.orientation()[2]);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.position() += camera_speed * vec3(camera.orientation()[0]);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.position() -= camera_speed * vec3(camera.orientation()[0]);
 }
 
 // Convertion from HSV to RGB.
@@ -272,7 +283,7 @@ int main()
         setupGuiFrame(gui_state);
 
         // GLFW input handling.
-        processInput(window);
+        processInput(window, camera);
         camera.isPerspective(gui_state.is_perspective);
 
         // Create camera view-projection matrix transform.
