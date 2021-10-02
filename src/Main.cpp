@@ -40,7 +40,7 @@ InputVariables input;
 void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     static float factor = 0.05f;
-    input.clip_plane_w += static_cast<float>(yoffset) * factor;
+    input.clip_plane_w -= static_cast<float>(yoffset) * factor;
 }
 
 // Directly process input with GLFW.
@@ -49,6 +49,25 @@ static void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
+
+// Convertion from HSV to RGB.
+// Inputs:
+// - H in range [0, 360.0];
+// - S in range [0, 1.0];
+// - H in range [0, 1.0].
+// Output: RGB color in range [0, 1.0].
+static vec3 hsvToRgb(float h, float s, float v)
+{
+    assert(h >= 0.0f);
+    assert(h <= 360.0f);
+    assert(s >= 0.0f);
+    assert(s <= 1.0f);
+    assert(v >= 0.0f);
+    assert(v <= 1.0f);
+
+    return vec3{h/360.0f, s, v};
+}
+
 
 // Main function.
 int main()
@@ -124,6 +143,8 @@ int main()
 
     ShaderProgram shader_normal("../src/shader/ClippingPlane.vert",
                                 "../src/shader/VertexColor.frag");
+    ShaderProgram shader_single_color("../src/shader/ClippingPlaneSingleColor.vert",
+                                      "../src/shader/VertexColor.frag");
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -246,17 +267,6 @@ int main()
             node->vertex_array->draw();
         }
 
-        // Draw icosahedron.
-        {
-            auto model = ico_object->worldTransformation();
-            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(ico_object->vertex_array->vao);
-            // Draw wireframe and then turn back to fill triangles.
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            ico_object->vertex_array->draw();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-
         // Draw torus.
         {
             auto model = torus_object->worldTransformation();
@@ -274,6 +284,22 @@ int main()
             shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(teapot_object->vertex_array->vao);
             teapot_object->vertex_array->draw();
+        }
+
+        // Draw icosahedron.
+        {
+            shader_single_color.use();
+            shader_single_color.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
+            shader_single_color.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
+            vec3 ico_color = hsvToRgb(gui_state.H, gui_state.S, gui_state.V);
+            shader_single_color.setUniform3f("u_color", ico_color.x, ico_color.y, ico_color.z);
+            auto model = ico_object->worldTransformation();
+            shader_single_color.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(ico_object->vertex_array->vao);
+            // Draw wireframe and then turn back to fill triangles.
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            ico_object->vertex_array->draw();
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // Render GUI on top.

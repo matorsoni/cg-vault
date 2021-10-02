@@ -21,6 +21,7 @@ public:
 
     // Uniform setters.
     void setUniform1i(const char* uniform_name, int value) const;
+    void setUniform3f(const char* uniform_name, float x, float y, float z) const;
     void setUniform4f(const char* uniform_name, float x, float y, float z, float w) const;
     void setUniformMat4f(const char* uniform_name, float* data);
 };

@@ -35,7 +35,18 @@ void setupGuiFrame(GuiState& gui_state)
         // Create a window and add elements into it.
         ImGui::Begin("Options");
 
+        ImGui::Text("System input:");
+        ImGui::Text("- Scroll to control clip plane.");
+        ImGui::Text("- Click and drag to rotate the scene.");
+        ImGui::Text("\n");
+
+        ImGui::Text("UI input:");
+
         ImGui::Checkbox("Perspective projection", &gui_state.is_perspective);
+
+        ImGui::SliderFloat("H value", &gui_state.H, 0.0f, 360.0f);
+        ImGui::SliderFloat("S value", &gui_state.S, 0.0f, 1.0f);
+        ImGui::SliderFloat("V value", &gui_state.V, 0.0f, 1.0f);
 
         ImGui::Text("Average time per frame: %.3f ms (%.1f FPS)",
                     gui_state.time_per_frame,

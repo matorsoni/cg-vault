@@ -8,6 +8,9 @@ struct GuiState
 {
     bool is_perspective = true;
     double time_per_frame = 1.0;
+    float H = 0.0f;
+    float S = 1.0f;
+    float V = 1.0f;
 };
 
 void setupImGui(GLFWwindow* window);
