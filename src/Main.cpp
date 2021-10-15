@@ -33,7 +33,7 @@ static void error_callback(int error, const char* description)
 // Simple global place holder for variables changed by user input.
 struct InputVariables
 {
-    float clip_plane_w = 0.0f;
+    float clip_plane_w = 100.0f;
 };
 InputVariables input;
 
@@ -192,6 +192,8 @@ int main()
                                 "../src/shader/VertexColor.frag");
     ShaderProgram shader_single_color("../src/shader/ClippingPlaneSingleColor.vert",
                                       "../src/shader/VertexColor.frag");
+    ShaderProgram shader_gouraud("../src/shader/GouraudSingleColor.vert",
+                                 "../src/shader/VertexColor.frag");
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -298,18 +300,18 @@ int main()
         scene.ori_y = arc_rotation[1];
         scene.ori_z = arc_rotation[2];
 
-        shader_normal.use();
-        shader_normal.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
+        shader_gouraud.use();
+        shader_gouraud.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
 
         // Define clipping plane.
         vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
-        shader_normal.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
+        shader_gouraud.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
 
         // Draw table.
         for (int i = 0; i < table_object->subnodes.size(); ++i) {
             auto* node = table_object->subnodes[i].get();
             auto model = node->worldTransformation();
-            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(node->vertex_array->vao);
             node->vertex_array->draw();
         }
@@ -317,7 +319,7 @@ int main()
         // Draw torus.
         {
             auto model = torus_object->worldTransformation();
-            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(torus_object->vertex_array->vao);
             // Draw wireframe and then turn back to fill triangles.
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -328,25 +330,25 @@ int main()
         // Draw teapot.
         {
             auto model = teapot_object->worldTransformation();
-            shader_normal.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(teapot_object->vertex_array->vao);
             teapot_object->vertex_array->draw();
         }
 
         // Draw icosahedron.
         {
-            shader_single_color.use();
-            shader_single_color.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
-            shader_single_color.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
+            shader_gouraud.use();
+            shader_gouraud.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
+            shader_gouraud.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
             vec3 ico_color = hsvToRgb(gui_state.H, gui_state.S, gui_state.V);
-            shader_single_color.setUniform3f("u_color", ico_color.x, ico_color.y, ico_color.z);
+            shader_gouraud.setUniform3f("u_color", ico_color.x, ico_color.y, ico_color.z);
             auto model = ico_object->worldTransformation();
-            shader_single_color.setUniformMat4f("u_model", glm::value_ptr(model));
+            shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(ico_object->vertex_array->vao);
             // Draw wireframe and then turn back to fill triangles.
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             ico_object->vertex_array->draw();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // Render GUI on top.
