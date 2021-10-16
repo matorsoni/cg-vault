@@ -288,9 +288,6 @@ int main()
         processInput(window, camera);
         camera.isPerspective(gui_state.is_perspective);
 
-        // Create camera view-projection matrix transform.
-        mat4 view_projection = camera.projection() * camera.view();
-
         // Process arcball motion.
         arcball.processInput(window);
         // Transform camera space rotation to world space rotation.
@@ -301,7 +298,8 @@ int main()
         scene.ori_z = arc_rotation[2];
 
         shader_gouraud.use();
-        shader_gouraud.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
+        shader_gouraud.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
+        shader_gouraud.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
 
         // Define clipping plane.
         vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
@@ -311,6 +309,8 @@ int main()
         for (int i = 0; i < table_object->subnodes.size(); ++i) {
             auto* node = table_object->subnodes[i].get();
             auto model = node->worldTransformation();
+            const vec3 table_color = vec3(245.f, 200.f, 66.f) / 255.f;
+            shader_gouraud.setUniform3f("u_color", table_color.x, table_color.y, table_color.z);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(node->vertex_array->vao);
             node->vertex_array->draw();
@@ -319,17 +319,18 @@ int main()
         // Draw torus.
         {
             auto model = torus_object->worldTransformation();
+            const vec3 torus_color = vec3(224.f, 61.f, 227.f) / 255.f;
+            shader_gouraud.setUniform3f("u_color", torus_color.x, torus_color.y, torus_color.z);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(torus_object->vertex_array->vao);
-            // Draw wireframe and then turn back to fill triangles.
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             torus_object->vertex_array->draw();
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // Draw teapot.
         {
             auto model = teapot_object->worldTransformation();
+            const vec3 teapot_color = vec3(44.f, 0.f, 255.f) / 255.f;
+            shader_gouraud.setUniform3f("u_color", teapot_color.x, teapot_color.y, teapot_color.z);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(teapot_object->vertex_array->vao);
             teapot_object->vertex_array->draw();
@@ -337,18 +338,12 @@ int main()
 
         // Draw icosahedron.
         {
-            shader_gouraud.use();
-            shader_gouraud.setUniformMat4f("u_view_projection", glm::value_ptr(view_projection));
-            shader_gouraud.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
             vec3 ico_color = hsvToRgb(gui_state.H, gui_state.S, gui_state.V);
             shader_gouraud.setUniform3f("u_color", ico_color.x, ico_color.y, ico_color.z);
             auto model = ico_object->worldTransformation();
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(ico_object->vertex_array->vao);
-            // Draw wireframe and then turn back to fill triangles.
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             ico_object->vertex_array->draw();
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // Render GUI on top.
