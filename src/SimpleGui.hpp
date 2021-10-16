@@ -11,6 +11,9 @@ struct GuiState
     float H = 0.0f;
     float S = 1.0f;
     float V = 1.0f;
+    // Lighting parameters.
+    float K_A = 0.2f;
+    float K_D = 1.0f;
 };
 
 void setupImGui(GLFWwindow* window);

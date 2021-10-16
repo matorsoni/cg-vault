@@ -126,7 +126,7 @@ int main()
         return -1;
     }
 
-    const int window_width = 960;
+    const int window_width = 1280;
     const int window_height = 720;
     // Set minimum OpenGL version expected by the context.
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -159,7 +159,7 @@ int main()
     // Set GLFW swap interval.
     glfwSwapInterval(1);
     // Set OpenGL constant states.
-    glClearColor(0.0f, 0.2f, 0.2f, 1.0f);
+    glClearColor(0.0f, 0.15f, 0.15f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CLIP_PLANE0);
     //glCullFace(GL_BACK);
@@ -297,16 +297,20 @@ int main()
         scene.ori_y = arc_rotation[1];
         scene.ori_z = arc_rotation[2];
 
-        // Light direction.
-        vec3 light_direction{cosf(tock), sinf(tock), 0.0f};
-
         shader_gouraud.use();
         shader_gouraud.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
         shader_gouraud.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
+
+        // Light direction.
+        vec3 light_direction{cosf(tock), sinf(tock), 0.0f};
         shader_gouraud.setUniform3f("u_light_direction",
                                     light_direction.x,
                                     light_direction.y,
                                     light_direction.z);
+
+        // Update lighting parameters from GUI.
+        shader_gouraud.setUniform1f("u_ambient_coef", gui_state.K_A);
+        shader_gouraud.setUniform1f("u_diffuse_coef", gui_state.K_D);
 
         // Define clipping plane.
         vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
@@ -336,7 +340,7 @@ int main()
         // Draw teapot.
         {
             auto model = teapot_object->worldTransformation();
-            const vec3 teapot_color = vec3(44.f, 0.f, 255.f) / 255.f;
+            const vec3 teapot_color = vec3(4.f, 0.f, 255.f) / 255.f;
             shader_gouraud.setUniform3f("u_color", teapot_color.x, teapot_color.y, teapot_color.z);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(teapot_object->vertex_array->vao);

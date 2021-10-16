@@ -9,14 +9,14 @@ uniform mat4 u_view;
 uniform mat4 u_projection;
 uniform vec4 u_clip_plane;
 uniform vec3 u_color;
+// Lighting.
 uniform vec3 u_light_direction;
+uniform float u_ambient_coef;
+uniform float u_diffuse_coef;
 
 out vec4 v_color;
 out vec2 v_tex;
 
-// Ambient illumination strength.
-const float k_a = 0.2;
-const float k_d = 1.0;
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
 
@@ -32,9 +32,9 @@ void main()
    gl_ClipDistance[0] = dot(world_pos, u_clip_plane);
 
    // 1) Ambient light.
-   vec3 ambient = k_a * light_color;
+   vec3 ambient = u_ambient_coef * light_color;
    // 2) Diffuse light.
-   vec3 diffuse = k_d * max(0.0, dot(-light_direction, normal)) * light_color;
+   vec3 diffuse = u_diffuse_coef * max(0.0, dot(-light_direction, normal)) * light_color;
    // Final vertex color:
    vec3 final_color = (ambient + diffuse) * u_color;
    v_color = vec4(final_color, 1.0);
