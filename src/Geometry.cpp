@@ -300,7 +300,7 @@ Mesh createTorus(float radius_a, float radius_b)
 
             // Compute normal vector.
             const float n_x = cos_phi * sin_theta;
-            const float n_y = sin_theta;
+            const float n_y = sin_phi;
             const float n_z = cos_phi * cos_theta;
 
             vertices.emplace_back(vec3{pos_x, pos_y, pos_z}, vec3{n_x, n_y, n_z});

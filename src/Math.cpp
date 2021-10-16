@@ -183,7 +183,8 @@ tuple<vec3, vec3> bezierSurfaceSample(const vector<vec3>& control_points,
     }
 
     // Compute normalized normal.
-    vec3 normal = normalize(cross(du_position, dv_position));
+    // The "-" sign seems to correct the normal vector orientation...
+    vec3 normal = normalize(-cross(du_position, dv_position));
 
     return make_tuple(position, normal);
 }
