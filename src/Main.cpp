@@ -297,9 +297,16 @@ int main()
         scene.ori_y = arc_rotation[1];
         scene.ori_z = arc_rotation[2];
 
+        // Light direction.
+        vec3 light_direction{cosf(tock), sinf(tock), 0.0f};
+
         shader_gouraud.use();
         shader_gouraud.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
         shader_gouraud.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
+        shader_gouraud.setUniform3f("u_light_direction",
+                                    light_direction.x,
+                                    light_direction.y,
+                                    light_direction.z);
 
         // Define clipping plane.
         vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
