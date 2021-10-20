@@ -27,30 +27,44 @@ out vec2 v_tex;
 
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
-
 void main()
 {
-   vec4 world_pos = u_model * vec4(in_pos, 1.0);
-   vec3 normal = normalize(
-      transpose(inverse(mat3(u_model))) * in_normal
+   mat4 model_view = u_view * u_model;
+
+   // Transform to view coordinates.
+   // Vertex position.
+   vec4 P4 = model_view * vec4(in_pos, 1.0);
+   vec3 P3 = vec3(P4) / P4.w;
+   // Vertex normal.
+   vec3 N = normalize(
+      transpose(inverse(mat3(model_view))) * in_normal
    );
-   vec3 L = normalize(-u_light_direction);
+   // Backwards light direction.
+   vec3 L = -normalize(mat3(u_view) * u_light_direction);
 
-   gl_Position = u_projection * u_view * world_pos;
-   gl_ClipDistance[0] = dot(world_pos, u_clip_plane);
-
-   // 1) Ambient light.
+   // Lighting components.
    vec3 ambient = u_ambient_coef * u_ka;
-   // 2) Diffuse light.
-   vec3 diffuse = u_diffuse_coef * max(0.0, dot(L, normal)) * u_kd;
-   // 3) Specular light.
-   vec3 R = reflect(-L, normal);      // Reflected light vector
-   vec3 V = normalize(-vec3(u_view * world_pos)); // Vector to viewer
-   float specAngle = max(dot(R, V), 0.0);
-   vec3 specular = u_specular_coef * pow(specAngle, u_shiny) * u_ks;
-   // Final vertex color:
-   vec3 final_color = ambient + diffuse + specular;
-   v_color = vec4(final_color, 1.0);
+   vec3 diffuse = vec3(0.0);
+   vec3 specular = vec3(0.0);
 
+   float incidence = dot(L, N);
+   if (incidence >= 0.0) {
+      diffuse = u_diffuse_coef * incidence * u_kd;
+
+      // Reflected light vector.
+      vec3 R = reflect(-L, N);
+      // Vector to viewer.
+      vec3 V = -normalize(P3);
+      float specAngle = max(dot(R, V), 0.0);
+      specular = u_specular_coef * pow(specAngle, u_shiny) * u_ks;
+   }
+   // Final vertex color:
+   vec3 final_color = (ambient + diffuse + specular) * light_color;
+
+   // Outputs.
+   gl_Position = u_projection * P4;
+   // Note: position is in view coords while u_clip_plane is in world coords.
+   gl_ClipDistance[0] = dot(P4, u_clip_plane);
+   v_color = vec4(final_color, 1.0);
    v_tex = in_tex;
 }
