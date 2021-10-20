@@ -128,6 +128,17 @@ void ShaderProgram::setUniform3f(const char* uniform_name, float x, float y, flo
     glUniform3f(uniform_location, x, y, z);
 }
 
+void ShaderProgram::setUniformVec3f(const char* uniform_name, const float* data) const
+{
+    int uniform_location = glGetUniformLocation(id_, uniform_name);
+    if (uniform_location == -1) {
+        cout << "Unable to locate uniform " << uniform_name << endl;
+        return;
+    }
+
+    glUniform3fv(uniform_location, 1, data);
+}
+
 void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, float z, float w) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
@@ -139,7 +150,7 @@ void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, flo
     glUniform4f(uniform_location, x, y, z, w);
 }
 
-void ShaderProgram::setUniformMat4f(const char* uniform_name, const float* data)
+void ShaderProgram::setUniformMat4f(const char* uniform_name, const float* data) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
     if (uniform_location == -1) {

@@ -23,8 +23,9 @@ public:
     void setUniform1i(const char* uniform_name, int value) const;
     void setUniform1f(const char* uniform_name, float value) const;
     void setUniform3f(const char* uniform_name, float x, float y, float z) const;
+    void setUniformVec3f(const char* uniform_name, const float* data) const;
     void setUniform4f(const char* uniform_name, float x, float y, float z, float w) const;
-    void setUniformMat4f(const char* uniform_name, const float* data);
+    void setUniformMat4f(const char* uniform_name, const float* data) const;
 };
 
 
