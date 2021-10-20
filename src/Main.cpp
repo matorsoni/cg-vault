@@ -261,6 +261,14 @@ int main()
     teapot_object->scale = vec3(0.2f);
     teapot_object->vertex_array = &teapot;
 
+    // Materials.
+    PhongMaterial ico_material;
+    PhongMaterial torus_material;
+    PhongMaterial table_material;
+        table_material.kd = vec3(1.0f, 1.0f, 0.0f);
+    PhongMaterial teapot_material;
+        teapot_material.kd = vec3(0.0f, 0.0f, 1.0f);
+
     // Setup camera.
     Camera camera(window_width, window_height);
     camera.position() = vec3(2.7f, 2.7f, 2.7f);
@@ -291,6 +299,13 @@ int main()
         // Create GUI frame.
         setupGuiFrame(gui_state);
 
+        const vec3 gui_color = hsvToRgb(gui_state.H, gui_state.S, gui_state.V);
+        const vec3 inv_color = hsvToRgb(gui_state.H > 180.f ? gui_state.H - 180.f : gui_state.H + 180.f,
+                                        gui_state.S,
+                                        gui_state.V);
+        ico_material  .kd = gui_color;
+        torus_material.kd = inv_color;
+
         // GLFW input handling.
         processInput(window, camera);
         camera.isPerspective(gui_state.is_perspective);
@@ -316,25 +331,22 @@ int main()
                                     light_direction.z);
 
         // Update lighting parameters from GUI.
-        shader_gouraud.setUniform1f("u_ambient_coef", gui_state.K_A);
-        shader_gouraud.setUniform1f("u_diffuse_coef", gui_state.K_D);
+        shader_gouraud.setUniform1f("u_ambient_coef", gui_state.ambient);
+        shader_gouraud.setUniform1f("u_diffuse_coef", gui_state.diffuse);
+        shader_gouraud.setUniform1f("u_specular_coef", gui_state.specular);
 
         // Define clipping plane.
         vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
         shader_gouraud.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
 
-        // Define global material for tests.
-        PhongMaterial material;
-
         // Draw table.
         for (int i = 0; i < table_object->subnodes.size(); ++i) {
             auto* node = table_object->subnodes[i].get();
             auto model = node->worldTransformation();
-            //const vec3 table_color = vec3(245.f, 200.f, 66.f) / 255.f;
-            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(material.ka));
-            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(material.kd));
-            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(material.ks));
-            shader_gouraud.setUniform1f("u_shiny", material.shiny);
+            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(table_material.ka));
+            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(table_material.kd));
+            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(table_material.ks));
+            shader_gouraud.setUniform1f("u_shiny", table_material.shiny);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(node->vertex_array->vao);
             node->vertex_array->draw();
@@ -343,12 +355,10 @@ int main()
         // Draw torus.
         {
             auto model = torus_object->worldTransformation();
-            //const vec3 torus_color = vec3(224.f, 61.f, 227.f) / 255.f;
-            //shader_gouraud.setUniform3f("u_color", torus_color.x, torus_color.y, torus_color.z);
-            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(material.ka));
-            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(material.kd));
-            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(material.ks));
-            shader_gouraud.setUniform1f("u_shiny", material.shiny);
+            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(torus_material.ka));
+            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(torus_material.kd));
+            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(torus_material.ks));
+            shader_gouraud.setUniform1f("u_shiny", torus_material.shiny);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(torus_object->vertex_array->vao);
             torus_object->vertex_array->draw();
@@ -357,12 +367,10 @@ int main()
         // Draw teapot.
         {
             auto model = teapot_object->worldTransformation();
-            //const vec3 teapot_color = vec3(4.f, 0.f, 255.f) / 255.f;
-            //shader_gouraud.setUniform3f("u_color", teapot_color.x, teapot_color.y, teapot_color.z);
-            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(material.ka));
-            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(material.kd));
-            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(material.ks));
-            shader_gouraud.setUniform1f("u_shiny", material.shiny);
+            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(teapot_material.ka));
+            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(teapot_material.kd));
+            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(teapot_material.ks));
+            shader_gouraud.setUniform1f("u_shiny", teapot_material.shiny);
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(teapot_object->vertex_array->vao);
             teapot_object->vertex_array->draw();
@@ -370,12 +378,10 @@ int main()
 
         // Draw icosahedron.
         {
-            //vec3 ico_color = hsvToRgb(gui_state.H, gui_state.S, gui_state.V);
-            //shader_gouraud.setUniform3f("u_color", ico_color.x, ico_color.y, ico_color.z);
-            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(material.ka));
-            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(material.kd));
-            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(material.ks));
-            shader_gouraud.setUniform1f("u_shiny", material.shiny);
+            shader_gouraud.setUniformVec3f("u_ka", glm::value_ptr(ico_material.ka));
+            shader_gouraud.setUniformVec3f("u_kd", glm::value_ptr(ico_material.kd));
+            shader_gouraud.setUniformVec3f("u_ks", glm::value_ptr(ico_material.ks));
+            shader_gouraud.setUniform1f("u_shiny", ico_material.shiny);
             auto model = ico_object->worldTransformation();
             shader_gouraud.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(ico_object->vertex_array->vao);

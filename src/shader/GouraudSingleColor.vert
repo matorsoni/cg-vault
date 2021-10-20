@@ -20,6 +20,7 @@ uniform float u_shiny;
 uniform vec3 u_light_direction;
 uniform float u_ambient_coef;
 uniform float u_diffuse_coef;
+uniform float u_specular_coef;
 
 out vec4 v_color;
 out vec2 v_tex;
@@ -46,7 +47,7 @@ void main()
    vec3 R = reflect(-L, normal);      // Reflected light vector
    vec3 V = normalize(-vec3(u_view * world_pos)); // Vector to viewer
    float specAngle = max(dot(R, V), 0.0);
-   vec3 specular = pow(specAngle, u_shiny) * u_ks;
+   vec3 specular = u_specular_coef * pow(specAngle, u_shiny) * u_ks;
    // Final vertex color:
    vec3 final_color = ambient + diffuse + specular;
    v_color = vec4(final_color, 1.0);

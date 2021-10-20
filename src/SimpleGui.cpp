@@ -50,8 +50,9 @@ void setupGuiFrame(GuiState& gui_state)
         ImGui::SliderFloat("V value", &gui_state.V, 0.0f, 1.0f);
 
         ImGui::Text("Lighting parameters:");
-        ImGui::SliderFloat("Ambient", &gui_state.K_A, 0.0f, 1.0f);
-        ImGui::SliderFloat("Diffuse", &gui_state.K_D, 0.0f, 1.0f);
+        ImGui::SliderFloat("Ambient", &gui_state.ambient, 0.0f, 1.0f);
+        ImGui::SliderFloat("Diffuse", &gui_state.diffuse, 0.0f, 1.0f);
+        ImGui::SliderFloat("Specular", &gui_state.specular, 0.0f, 1.0f);
 
         ImGui::Text("Average time per frame: %.3f ms (%.1f FPS)",
                     gui_state.time_per_frame,
