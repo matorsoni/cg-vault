@@ -34,7 +34,7 @@ void main()
    // Transform to view coordinates.
    // Vertex position.
    vec4 P4 = model_view * vec4(in_pos, 1.0);
-   vec3 P3 = vec3(P4) / P4.w;
+   vec3 P = vec3(P4) / P4.w;
    // Vertex normal.
    vec3 N = normalize(
       transpose(inverse(mat3(model_view))) * in_normal
@@ -54,7 +54,7 @@ void main()
       // Reflected light vector.
       vec3 R = reflect(-L, N);
       // Vector to viewer.
-      vec3 V = -normalize(P3);
+      vec3 V = -normalize(P);
       float specAngle = max(dot(R, V), 0.0);
       specular = u_specular_coef * pow(specAngle, u_shiny) * u_ks;
    }

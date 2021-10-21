@@ -1,0 +1,37 @@
+#version 400 core
+
+layout (location = 0) in vec3 in_pos;
+layout (location = 1) in vec3 in_normal;
+layout (location = 2) in vec2 in_tex;
+
+out vec3 P;
+out vec3 N;
+out vec3 L;
+
+// Transforms and geometry data.
+uniform mat4 u_model;
+uniform mat4 u_view;
+uniform mat4 u_projection;
+uniform vec4 u_clip_plane;
+
+uniform vec3 u_light_direction;
+
+void main()
+{
+    mat4 model_view = u_view * u_model;
+
+    // Transform to view coordinates.
+    // Vertex position.
+    vec4 P4 = model_view * vec4(in_pos, 1.0);
+    P = vec3(P4) / P4.w;
+    // Vertex normal.
+    N = normalize(
+       transpose(inverse(mat3(model_view))) * in_normal
+    );
+    // Backwards light direction.
+    L = -normalize(mat3(u_view) * u_light_direction);
+
+    gl_Position = u_projection * P4;
+    // Note: position is in view coords while u_clip_plane is in world coords.
+    gl_ClipDistance[0] = dot(P4, u_clip_plane);
+}
