@@ -203,7 +203,6 @@ int main()
                                  "../src/shader/VertexColor.frag");
     ShaderProgram shader_phong("../src/shader/Phong.vert",
                                "../src/shader/Phong.frag");
-    const ShaderProgram& shader = shader_phong;
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -321,6 +320,11 @@ int main()
         scene.ori_x = arc_rotation[0];
         scene.ori_y = arc_rotation[1];
         scene.ori_z = arc_rotation[2];
+
+        // Determine shader to be used.
+        ShaderProgram& shader = gui_state.shader == 0 ? shader_gouraud :
+                                gui_state.shader == 1 ? shader_phong   :
+                                shader_gouraud;
 
         shader.use();
         shader.setUniformMat4f("u_view", glm::value_ptr(camera.view()));

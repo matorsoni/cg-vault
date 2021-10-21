@@ -49,6 +49,10 @@ void setupGuiFrame(GuiState& gui_state)
         ImGui::SliderFloat("S value", &gui_state.S, 0.0f, 1.0f);
         ImGui::SliderFloat("V value", &gui_state.V, 0.0f, 1.0f);
 
+        ImGui::Text("Shading options:");
+        ImGui::RadioButton("Gouraud", &gui_state.shader, 0);   ImGui::SameLine();
+        ImGui::RadioButton("Phong", &gui_state.shader, 1);
+
         ImGui::Text("Lighting parameters:");
         ImGui::SliderFloat("Ambient", &gui_state.ambient, 0.0f, 1.0f);
         ImGui::SliderFloat("Diffuse", &gui_state.diffuse, 0.0f, 1.0f);
