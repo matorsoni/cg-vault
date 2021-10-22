@@ -199,6 +199,8 @@ int main()
     //                            "../src/shader/VertexColor.frag");
     //ShaderProgram shader_single_color("../src/shader/ClippingPlaneSingleColor.vert",
     //                                  "../src/shader/VertexColor.frag");
+    ShaderProgram shader_flat("../src/shader/Flat.vert",
+                              "../src/shader/FlatVertexColor.frag");
     ShaderProgram shader_gouraud("../src/shader/GouraudSingleColor.vert",
                                  "../src/shader/VertexColor.frag");
     ShaderProgram shader_phong("../src/shader/Phong.vert",
@@ -267,9 +269,12 @@ int main()
     PhongMaterial ico_material;
     PhongMaterial torus_material;
     PhongMaterial table_material;
-        table_material.kd = vec3(1.0f, 1.0f, 0.0f);
+        table_material.ka = vec3(128.f, 83.f, 0.f) / 255.f;
+        table_material.kd = vec3(181.f, 88.f, 0.f) / 255.f;
     PhongMaterial teapot_material;
-        teapot_material.kd = vec3(0.0f, 0.0f, 1.0f);
+        teapot_material.ka = vec3(0.f, 0.f, 1.f);
+        teapot_material.kd = vec3(0.f, 213.f, 255.f) / 255.f;
+        teapot_material.shiny = 100.f;
 
     // Setup camera.
     Camera camera(window_width, window_height);
@@ -322,8 +327,9 @@ int main()
         scene.ori_z = arc_rotation[2];
 
         // Determine shader to be used.
-        ShaderProgram& shader = gui_state.shader == 0 ? shader_gouraud :
-                                gui_state.shader == 1 ? shader_phong   :
+        ShaderProgram& shader = gui_state.shader == 0 ? shader_flat :
+                                gui_state.shader == 1 ? shader_gouraud :
+                                gui_state.shader == 2 ? shader_phong   :
                                 shader_gouraud;
 
         shader.use();
