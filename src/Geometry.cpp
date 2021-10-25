@@ -32,9 +32,9 @@ static void triangulatePatch(vector<unsigned int>& indices,
     // For each vertex position, append the corresponding right-hand oriented triangles.
     for (int i = 0; i < rows - 1; ++i) {
         for (int j = 0; j < cols - 1; ++j) {
-            auto current = first_index + static_cast<unsigned int>(i*cols + j);
-            auto right = current + 1;
-            auto below = current + cols;
+            auto current     = first_index + static_cast<unsigned int>(i*cols + j);
+            auto right       = current + 1;
+            auto below       = current + cols;
             auto right_below = current + cols + 1;
 
             // First triangle.
@@ -49,9 +49,9 @@ static void triangulatePatch(vector<unsigned int>& indices,
 
         if (wrap_horizontally) {
             // Glue right and left together.
-            auto current = first_index + static_cast<unsigned int>(i*cols + cols-1);
-            auto right = first_index + static_cast<unsigned int>(i*cols);
-            auto below = current + cols;
+            auto current     = first_index + static_cast<unsigned int>(i*cols + cols-1);
+            auto right       = first_index + static_cast<unsigned int>(i*cols);
+            auto below       = current + cols;
             auto right_below = right + cols;
             // First triangle.
             indices.emplace_back(below);
@@ -67,10 +67,26 @@ static void triangulatePatch(vector<unsigned int>& indices,
     if (wrap_vertically) {
         // Glue top and bottom together.
         for (int j = 0; j < cols - 1; ++j) {
-            auto current = first_index + static_cast<unsigned int>((rows-1)*cols + j);
-            auto right = current + 1;
-            auto below = first_index + j;
+            auto current     = first_index + static_cast<unsigned int>((rows-1)*cols + j);
+            auto right       = current + 1;
+            auto below       = first_index + j;
             auto right_below = below + 1;
+            // First triangle.
+            indices.emplace_back(below);
+            indices.emplace_back(right_below);
+            indices.emplace_back(current);
+            // Second triangle.
+            indices.emplace_back(right_below);
+            indices.emplace_back(right);
+            indices.emplace_back(current);
+        }
+
+        // Treat the wrapping of the very last triagle.
+        if (wrap_horizontally) {
+            auto current     = first_index + static_cast<unsigned int>((rows-1)*cols + cols-1);
+            auto right       = first_index + static_cast<unsigned int>((rows-1)*cols);
+            auto below       = first_index + static_cast<unsigned int>(cols-1);
+            auto right_below = first_index;
             // First triangle.
             indices.emplace_back(below);
             indices.emplace_back(right_below);
