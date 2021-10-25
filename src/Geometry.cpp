@@ -15,6 +15,13 @@ using glm::normalize;
 static constexpr float PI = 3.14159f;
 
 // Generate triangle indices for a rectangular patch and append it to the input indicex list.
+//
+// . . . .
+// . . . .   ->   |\|\|\|
+// . . . .        |\|\|\|
+//
+// Order of vertices: a triangle's last vertex (OpenGL's provoking vertex by default) is the same
+// between neighbouring triangles. This makes for a pleasant flat shading.
 static void triangulatePatch(vector<unsigned int>& indices,
                              int rows,
                              int cols,
@@ -31,13 +38,13 @@ static void triangulatePatch(vector<unsigned int>& indices,
             auto right_below = current + cols + 1;
 
             // First triangle.
-            indices.emplace_back(current);
-            indices.emplace_back(below);
-            indices.emplace_back(right);
-            // Second triangle.
-            indices.emplace_back(right);
             indices.emplace_back(below);
             indices.emplace_back(right_below);
+            indices.emplace_back(current);
+            // Second triangle.
+            indices.emplace_back(right_below);
+            indices.emplace_back(right);
+            indices.emplace_back(current);
         }
 
         if (wrap_horizontally) {
@@ -47,13 +54,13 @@ static void triangulatePatch(vector<unsigned int>& indices,
             auto below = current + cols;
             auto right_below = right + cols;
             // First triangle.
-            indices.emplace_back(current);
-            indices.emplace_back(below);
-            indices.emplace_back(right);
-            // Second triangle.
-            indices.emplace_back(right);
             indices.emplace_back(below);
             indices.emplace_back(right_below);
+            indices.emplace_back(current);
+            // Second triangle.
+            indices.emplace_back(right_below);
+            indices.emplace_back(right);
+            indices.emplace_back(current);
         }
     }
 
@@ -65,13 +72,13 @@ static void triangulatePatch(vector<unsigned int>& indices,
             auto below = first_index + j;
             auto right_below = below + 1;
             // First triangle.
-            indices.emplace_back(current);
-            indices.emplace_back(below);
-            indices.emplace_back(right);
-            // Second triangle.
-            indices.emplace_back(right);
             indices.emplace_back(below);
             indices.emplace_back(right_below);
+            indices.emplace_back(current);
+            // Second triangle.
+            indices.emplace_back(right_below);
+            indices.emplace_back(right);
+            indices.emplace_back(current);
         }
     }
 }
