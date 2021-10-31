@@ -22,18 +22,19 @@ const vec3 light_color = vec3(1.0, 1.0, 1.0);
 void main()
 {
     vec3 normal = normalize(N);
+    vec3 light  = normalize(L);
 
     // Lighting components.
     vec3 ambient = u_ambient_coef * u_ka;
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
 
-    float incidence = dot(L, normal);
+    float incidence = dot(light, normal);
     if (incidence >= 0.0) {
         diffuse = u_diffuse_coef * incidence * u_kd;
 
         // Reflected light vector.
-        vec3 R = reflect(-L, normal);
+        vec3 R = reflect(-light, normal);
         // Vector to viewer.
         vec3 V = -normalize(P);
         float specAngle = max(dot(R, V), 0.0);

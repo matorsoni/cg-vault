@@ -205,6 +205,8 @@ int main()
                                  "../src/shader/VertexColor.frag");
     ShaderProgram shader_phong("../src/shader/Phong.vert",
                                "../src/shader/Phong.frag");
+    ShaderProgram shader_light_source("../src/shader/LightSource.vert",
+                                      "../src/shader/VertexColor.frag");
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -264,6 +266,12 @@ int main()
     teapot_object->ori_z = cross(teapot_object->ori_x, teapot_object->ori_y);
     teapot_object->scale = vec3(0.2f);
     teapot_object->vertex_array = &teapot;
+
+    // Light source.
+    SceneNode* point_light = scene.makeSubnode();
+    point_light->pos = vec3{0.0f, 2.0f, 0.0f};
+    point_light->scale = vec3(0.1f);
+    point_light->vertex_array = &cube;
 
     // Materials.
     PhongMaterial ico_material;
@@ -336,12 +344,13 @@ int main()
         shader.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
         shader.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
 
-        // Light direction.
-        vec3 light_direction{-cosf(tock), -sinf(tock), 0.0f};
-        shader.setUniform3f("u_light_direction",
-                            light_direction.x,
-                            light_direction.y,
-                            light_direction.z);
+        // World light position.
+        point_light->pos = vec3{cosf(tock), 2.2f, sinf(tock)};
+        vec3 light_position = vec3(point_light->worldTransformation()[3]);
+        shader.setUniform3f("u_light_position",
+                            light_position.x,
+                            light_position.y,
+                            light_position.z);
 
         // Update lighting parameters from GUI.
         shader.setUniform1f("u_ambient_coef", gui_state.ambient);
@@ -399,6 +408,17 @@ int main()
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(ico_object->vertex_array->vao);
             ico_object->vertex_array->draw();
+        }
+
+        // Draw light source.
+        {
+            shader_light_source.use();
+            shader_light_source.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
+            shader_light_source.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
+            auto model = point_light->worldTransformation();
+            shader_light_source.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(point_light->vertex_array->vao);
+            point_light->vertex_array->draw();
         }
 
         // Render GUI on top.

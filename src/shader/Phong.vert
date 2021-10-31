@@ -14,7 +14,7 @@ uniform mat4 u_view;
 uniform mat4 u_projection;
 uniform vec4 u_clip_plane;
 
-uniform vec3 u_light_direction;
+uniform vec3 u_light_position;
 
 void main()
 {
@@ -29,7 +29,9 @@ void main()
        transpose(inverse(mat3(model_view))) * in_normal
     );
     // Backwards light direction.
-    L = -normalize(mat3(u_view) * u_light_direction);
+    vec4 light4 = u_view * vec4(u_light_position, 1.0);
+    vec3 light3 = vec3(light4) / light4.w;
+    L = normalize(light3 - P);
 
     gl_Position = u_projection * P4;
     // Note: position is in view coords while u_clip_plane is in world coords.

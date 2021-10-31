@@ -17,7 +17,7 @@ uniform vec3 u_ks;
 uniform float u_shiny;
 
 // Lighting.
-uniform vec3 u_light_direction;
+uniform vec3 u_light_position;
 uniform float u_ambient_coef;
 uniform float u_diffuse_coef;
 uniform float u_specular_coef;
@@ -40,7 +40,9 @@ void main()
       transpose(inverse(mat3(model_view))) * in_normal
    );
    // Backwards light direction.
-   vec3 L = -normalize(mat3(u_view) * u_light_direction);
+   vec4 light4 = u_view * vec4(u_light_position, 1.0);
+   vec3 light3 = vec3(light4) / light4.w;
+   vec3 L = normalize(light3 - P);
 
    // Lighting components.
    vec3 ambient = u_ambient_coef * u_ka;
