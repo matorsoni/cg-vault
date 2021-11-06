@@ -7,11 +7,14 @@ layout (location = 2) in vec2 in_tex;
 out vec3 P;
 out vec3 N;
 out vec3 L;
+out vec4 light_space_pos;
 
 // Transforms and geometry data.
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
+uniform mat4 u_light_view;
+uniform mat4 u_light_projection;
 uniform vec4 u_clip_plane;
 
 uniform vec3 u_light_position;
@@ -34,6 +37,7 @@ void main()
     L = normalize(light3 - P);
 
     gl_Position = u_projection * P4;
+    light_space_pos = u_light_view * u_light_projection * P4;
     // Note: position is in view coords while u_clip_plane is in world coords.
     gl_ClipDistance[0] = dot(P4, u_clip_plane);
 }

@@ -207,6 +207,8 @@ int main()
                                "../src/shader/Phong.frag");
     ShaderProgram shader_light_source("../src/shader/LightSource.vert",
                                       "../src/shader/VertexColor.frag");
+    ShaderProgram shader_shadow("../src/shader/Shadow.vert",
+                                "../src/shader/Shadow.frag");
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -296,6 +298,26 @@ int main()
     setupImGui(window);
     GuiState gui_state;
 
+    // Shadow stuff.
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Main loop.
     double tick = glfwGetTime();
     double tock = 0.0;
@@ -334,15 +356,73 @@ int main()
         scene.ori_y = arc_rotation[1];
         scene.ori_z = arc_rotation[2];
 
+        // --- Shadow pass --- //
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        Camera light_source_camera(SHADOW_WIDTH, SHADOW_HEIGHT);
+        light_source_camera.position() = point_light->pos;
+        light_source_camera.lookAt(vec3(0.0f, table_top_y, 0.0f));
+        shader_shadow.use();
+        shader_shadow.setUniformMat4f("u_light_view",
+                                      glm::value_ptr(light_source_camera.view()));
+        shader_shadow.setUniformMat4f("u_light_projection",
+                                      glm::value_ptr(light_source_camera.projection()));
+        // Draw table for shadow pass.
+        for (int i = 0; i < table_object->subnodes.size(); ++i) {
+            auto* node = table_object->subnodes[i].get();
+            auto model = node->worldTransformation();
+            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(node->vertex_array->vao);
+            node->vertex_array->draw();
+        }
+
+        // Draw torus for shadow pass.
+        {
+            auto model = torus_object->worldTransformation();
+            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(torus_object->vertex_array->vao);
+            torus_object->vertex_array->draw();
+        }
+
+        // Draw teapot for shadow pass.
+        {
+            auto model = teapot_object->worldTransformation();
+            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(teapot_object->vertex_array->vao);
+            teapot_object->vertex_array->draw();
+        }
+
+        // Draw icosahedron for shadow pass.
+        {
+            auto model = ico_object->worldTransformation();
+            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
+            glBindVertexArray(ico_object->vertex_array->vao);
+            ico_object->vertex_array->draw();
+        }
+
+        // Render pass.
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, window_width, window_height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+
         // Determine shader to be used.
-        ShaderProgram& shader = gui_state.shader == 0 ? shader_flat :
-                                gui_state.shader == 1 ? shader_gouraud :
-                                gui_state.shader == 2 ? shader_phong   :
-                                shader_gouraud;
+        ShaderProgram& shader = //gui_state.shader == 0 ? shader_flat :
+                                //gui_state.shader == 1 ? shader_gouraud :
+                                //gui_state.shader == 2 ? shader_phong   :
+                                shader_phong;
 
         shader.use();
         shader.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
         shader.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
+        shader.setUniformMat4f("u_light_view",
+                               glm::value_ptr(light_source_camera.view()));
+        shader.setUniformMat4f("u_light_projection",
+                               glm::value_ptr(light_source_camera.projection()));
+        shader.setUniform1i("shadow_map", 0);
 
         // World light position.
         point_light->pos = vec3{cosf(tock), 2.2f, sinf(tock)};

@@ -11,7 +11,7 @@
 template <typename T>
 T Lerp(const T& a, const T& b, float t)
 {
-    return (1.0f - t) * a + t * b;
+    return a + t * (b - a);
 }
 
 // Create rotation matrix.
