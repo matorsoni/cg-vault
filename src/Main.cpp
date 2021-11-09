@@ -420,11 +420,10 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        shader_shadow_debug.use();
-        shader_shadow_debug.setUniform1i("shadow_map", 0);
-        glBindVertexArray(quad.vao);
-        quad.draw();
-/*
+        //shader_shadow_debug.use();
+        //shader_shadow_debug.setUniform1i("shadow_map", 0);
+        //glBindVertexArray(quad.vao);
+        //quad.draw();
 
         // Determine shader to be used.
         ShaderProgram& shader = //gui_state.shader == 0 ? shader_flat :
@@ -514,7 +513,7 @@ int main()
             glBindVertexArray(point_light->vertex_array->vao);
             point_light->vertex_array->draw();
         }
-*/
+
         // Render GUI on top.
         renderGui();
 

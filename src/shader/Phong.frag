@@ -3,7 +3,7 @@
 in vec3 P;
 in vec3 N;
 in vec3 L;
-in vec4 light_space_pos;
+in vec3 light_space_pos;
 
 out vec4 FragColor;
 
@@ -23,14 +23,14 @@ uniform sampler2D shadow_map;
 
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
-float computeShadow(vec4 frag_light_space_pos)
+float computeShadow(vec3 frag_light_space_pos)
 {
     // perform perspective divide
-    vec3 projCoords = frag_light_space_pos.xyz / frag_light_space_pos.w;
+    //vec3 projCoords = frag_light_space_pos.xyz / frag_light_space_pos.w;
     // transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
+    vec3 projCoords = frag_light_space_pos * 0.5 + 0.5;
     // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadow_map, projCoords.xy).r;
+    float closestDepth = texture(shadow_map, projCoords.xy).x;
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
