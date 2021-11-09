@@ -195,6 +195,10 @@ int main()
     const float sample_density = 2.0f;
     VertexArray teapot(createTeapot(sample_density));
 
+    // Create debug quad.
+    Mesh quad_mesh = createQuad();
+    VertexArray quad(quad_mesh);
+
     //ShaderProgram shader_normal("../src/shader/ClippingPlane.vert",
     //                            "../src/shader/VertexColor.frag");
     //ShaderProgram shader_single_color("../src/shader/ClippingPlaneSingleColor.vert",
@@ -209,6 +213,8 @@ int main()
                                       "../src/shader/VertexColor.frag");
     ShaderProgram shader_shadow("../src/shader/Shadow.vert",
                                 "../src/shader/Shadow.frag");
+    ShaderProgram shader_shadow_debug("../src/shader/Debug.vert",
+                                      "../src/shader/Debug.frag");
 
     /*** Setup the scene. ***/
     SceneNode scene;
@@ -303,7 +309,7 @@ int main()
     unsigned int depthMap;
     glGenTextures(1, &depthMap);
     glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32,
                  SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -314,6 +320,7 @@ int main()
     glGenFramebuffers(1, &depthMapFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    cout << glCheckFramebufferStatus(GL_FRAMEBUFFER) << " " << GL_FRAMEBUFFER_COMPLETE << endl;
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -361,9 +368,13 @@ int main()
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        // World light position.
+        point_light->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
+        vec3 light_position = vec3(point_light->worldTransformation()[3]);
+
         Camera light_source_camera(SHADOW_WIDTH, SHADOW_HEIGHT);
-        light_source_camera.position() = point_light->pos;
-        light_source_camera.lookAt(vec3(0.0f, table_top_y, 0.0f));
+        light_source_camera.position() = light_position;
+        light_source_camera.lookAt(vec3(0.0f, 0.0f, 0.0f));
         shader_shadow.use();
         shader_shadow.setUniformMat4f("u_light_view",
                                       glm::value_ptr(light_source_camera.view()));
@@ -409,6 +420,12 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
+        shader_shadow_debug.use();
+        shader_shadow_debug.setUniform1i("shadow_map", 0);
+        glBindVertexArray(quad.vao);
+        quad.draw();
+/*
+
         // Determine shader to be used.
         ShaderProgram& shader = //gui_state.shader == 0 ? shader_flat :
                                 //gui_state.shader == 1 ? shader_gouraud :
@@ -424,9 +441,6 @@ int main()
                                glm::value_ptr(light_source_camera.projection()));
         shader.setUniform1i("shadow_map", 0);
 
-        // World light position.
-        point_light->pos = vec3{cosf(tock), 2.2f, sinf(tock)};
-        vec3 light_position = vec3(point_light->worldTransformation()[3]);
         shader.setUniform3f("u_light_position",
                             light_position.x,
                             light_position.y,
@@ -500,7 +514,7 @@ int main()
             glBindVertexArray(point_light->vertex_array->vao);
             point_light->vertex_array->draw();
         }
-
+*/
         // Render GUI on top.
         renderGui();
 

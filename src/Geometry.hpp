@@ -13,6 +13,8 @@ Mesh createCubeWithoutIndices();
 
 Mesh createCube();
 
+Mesh createQuad();
+
 Mesh createSquare();
 
 Mesh createIcosahedron();

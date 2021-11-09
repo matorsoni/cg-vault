@@ -230,6 +230,23 @@ Mesh createCubeWithoutIndices()
 }
 
 
+Mesh createQuad()
+{
+    vector<Vertex> vertices = {
+        {vec3(-1.0f,  1.0f, 0.0f), vec3(0.0f), vec2(0.0f, 1.0f)},
+        {vec3(-1.0f, -1.0f, 0.0f), vec3(0.0f), vec2(0.0f, 0.0f)},
+        {vec3( 1.0f, -1.0f, 0.0f), vec3(0.0f), vec2(1.0f, 0.0f)},
+        {vec3( 1.0f,  1.0f, 0.0f), vec3(0.0f), vec2(1.0f, 1.0f)}
+    };
+
+    vector<unsigned int> indices = {
+        0, 1, 2,
+        2, 3, 0
+    };
+
+    return Mesh(vertices, indices);
+}
+
 Mesh createSquare()
 {
     vector<Vertex> vertices = {
