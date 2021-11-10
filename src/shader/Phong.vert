@@ -21,24 +21,23 @@ uniform vec3 u_light_position;
 
 void main()
 {
-    mat4 model_view = u_view * u_model;
-
-    // Transform to view coordinates.
-    // Vertex position.
-    vec4 P4 = model_view * vec4(in_pos, 1.0);
-    P = vec3(P4) / P4.w;
+    // Transform vertex position and normal to view coordinates.
+    vec4 world_pos = u_model * vec4(in_pos, 1.0);
+    vec4 view_pos = u_view * world_pos;
+    P = vec3(view_pos) / view_pos.w;
     // Vertex normal.
     N = normalize(
-       transpose(inverse(mat3(model_view))) * in_normal
+       transpose(inverse(mat3(u_view * u_model))) * in_normal
     );
+
     // Backwards light direction.
     vec4 light4 = u_view * vec4(u_light_position, 1.0);
     vec3 light3 = vec3(light4) / light4.w;
     L = normalize(light3 - P);
 
-    gl_Position = u_projection * P4;
-    vec4 light_space_pos4 = u_light_projection * u_light_view * P4;
+    gl_Position = u_projection * view_pos;
+    vec4 light_space_pos4 = u_light_projection * u_light_view * world_pos;
     light_space_pos = light_space_pos4.xyz / light_space_pos4.w;
     // Note: position is in view coords while u_clip_plane is in world coords.
-    gl_ClipDistance[0] = dot(P4, u_clip_plane);
+    gl_ClipDistance[0] = dot(view_pos, u_clip_plane);
 }
