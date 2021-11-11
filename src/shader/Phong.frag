@@ -22,6 +22,7 @@ uniform float u_specular_coef;
 uniform sampler2D shadow_map;
 
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
+const float depth_bias = 0.0001;
 
 float computeShadow(vec3 frag_light_space_pos)
 {
@@ -34,7 +35,7 @@ float computeShadow(vec3 frag_light_space_pos)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // check whether current frag pos is in shadow
-    return currentDepth > closestDepth ? 1.0 : 0.0;
+    return currentDepth > closestDepth + depth_bias ? 1.0 : 0.0;
 }
 
 void main()
