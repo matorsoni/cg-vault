@@ -30,6 +30,14 @@ glm::mat4 getScale(const glm::vec3& u);
 // Create translation matrix.
 glm::mat4 getTranslation(const glm::vec3& u);
 
+// Convertion from HSV to RGB.
+// Inputs:
+// - H in range [0, 360.0];
+// - S in range [0, 1.0];
+// - H in range [0, 1.0].
+// Output: RGB color in range [0, 1.0].
+glm::vec3 hsvToRgb(float h, float s, float v);
+
 // Simple factorial.
 uint64_t factorial(int n);
 

@@ -61,60 +61,6 @@ static void processInput(GLFWwindow* window, Camera& camera)
         camera.position() -= camera_speed * vec3(camera.orientation()[0]);
 }
 
-// Convertion from HSV to RGB.
-// Inputs:
-// - H in range [0, 360.0];
-// - S in range [0, 1.0];
-// - H in range [0, 1.0].
-// Output: RGB color in range [0, 1.0].
-static vec3 hsvToRgb(float h, float s, float v)
-{
-    assert(h >= 0.0f);
-    assert(h <= 360.0f);
-    assert(s >= 0.0f);
-    assert(s <= 1.0f);
-    assert(v >= 0.0f);
-    assert(v <= 1.0f);
-
-    static const vec3 BLACK    {0.0f, 0.0f, 0.0f};
-    static const vec3 WHITE    {1.0f, 1.0f, 1.0f};
-    static const vec3 RED      {1.0f, 0.0f, 0.0f};
-    static const vec3 YELLOW   {1.0f, 1.0f, 0.0f};
-    static const vec3 GREEN    {0.0f, 1.0f, 0.0f};
-    static const vec3 CYAN     {0.0f, 1.0f, 1.0f};
-    static const vec3 BLUE     {0.0f, 0.0f, 1.0f};
-    static const vec3 MAGENTA  {1.0f, 0.0f, 1.0f};
-    static const vec3 HUE_WHEEL[6] = {RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA};
-
-    float int_part_float = 0.0f;
-    // Division by 60 + 0.01 to make sure the integer part can not reach 6.
-    const float frac_part = modf(h / 60.01f, &int_part_float);
-    const auto int_part = static_cast<int>(int_part_float);
-    assert(frac_part >= 0.0f);
-    assert(frac_part <= 1.0f);
-    assert(int_part >= 0);
-    assert(int_part <= 5);
-
-    // Determine the color hue.
-    vec3 color_a, color_b;
-    if (int_part >= 5) {
-        color_a = HUE_WHEEL[5];
-        color_b = HUE_WHEEL[0];
-    }
-    else {
-        color_a = HUE_WHEEL[int_part];
-        color_b = HUE_WHEEL[int_part + 1];
-    }
-    vec3 final_color = Lerp(color_a, color_b, frac_part);
-
-    // Factor "saturation" in.
-    final_color = Lerp(WHITE, final_color, s);
-    // Factor "value" in.
-    final_color = Lerp(BLACK, final_color, v);
-
-    return final_color;
-}
-
 struct PhongMaterial
 {
     vec3 ka{0.0f, 0.0f, 0.0f};
