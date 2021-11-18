@@ -13,7 +13,7 @@ TableScene::TableScene():
     // Meshes.
     cube_(createCubeWithoutIndices()),
     square_(createSquare()),
-    icosahedron_(createIcosahedron()),
+    icosahedron_(createSubdividedIcosahedron(3)),
     torus_(createTorus(1.0f, 0.15f)),
     teapot_(createTeapot(2.0f)),
     // Objects.
@@ -26,23 +26,23 @@ TableScene::TableScene():
     assert(root_);
 
     // Table variables.
-    const float table_width = 2.0f;
-    const float table_depth = 1.0f;
-    const float table_height = 1.0f;
+    const float table_length = 2.0f;
+    const float table_width = 1.0f;
+    const float leg_height = 1.0f;
     const float leg_width = 0.1f;
-    const float top_girth = 0.1f;
+    const float top_height = 0.1f;
     const float top_scale_factor = 1.1f;
 
     // Table object.
     table_node = root_->makeSubnode();
     // Legs.
     {
-        const vec3 leg_scale = vec3(leg_width, table_height, leg_width);
+        const vec3 leg_scale = vec3(leg_width, leg_height, leg_width);
         vec3 leg_position[] = {
-            vec3(table_depth/2, table_height/2, table_width/2),
-            vec3(table_depth/2, table_height/2, -table_width/2),
-            vec3(-table_depth/2, table_height/2, -table_width/2),
-            vec3(-table_depth/2, table_height/2, table_width/2)
+            vec3(table_width/2, leg_height/2, table_length/2),
+            vec3(table_width/2, leg_height/2, -table_length/2),
+            vec3(-table_width/2, leg_height/2, -table_length/2),
+            vec3(-table_width/2, leg_height/2, table_length/2)
         };
         for (int i = 0; i < 4; ++i) {
             SceneNode* leg_object = table_node->makeSubnode();
@@ -54,14 +54,14 @@ TableScene::TableScene():
     // Top.
     {
         SceneNode* top_object = table_node->makeSubnode();
-        top_object->pos = vec3(0.0f, table_height + top_girth/2, 0.0f);
-        top_object->scale = vec3(top_scale_factor * table_depth,
-                                 top_girth,
-                                 top_scale_factor * table_width);
+        top_object->pos = vec3(0.0f, leg_height + top_height/2, 0.0f);
+        top_object->scale = vec3(top_scale_factor * table_width,
+                                 top_height,
+                                 top_scale_factor * table_length);
         top_object->vertex_array = &cube_;
     }
 
-    const float table_top_y = table_height + top_girth;
+    const float table_top_y = leg_height + top_height;
 
     // Icosahedron object.
     ico_node = root_->makeSubnode();

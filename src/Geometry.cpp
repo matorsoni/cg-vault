@@ -313,6 +313,17 @@ Mesh createIcosahedron()
 }
 
 
+Mesh createSubdividedIcosahedron(int order)
+{
+    assert(order >= 0);
+    Mesh ico_mesh = createIcosahedron();
+    for (int i = 0; i < order; ++i)
+        subdivide(ico_mesh);
+
+    return ico_mesh;
+}
+
+
 Mesh createTorus(float radius_a, float radius_b)
 {
     assert(radius_a >= 0.0f);

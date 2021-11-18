@@ -156,7 +156,7 @@ int main()
     // Setup camera.
     Camera camera(window_width, window_height);
     camera.position() = vec3(2.7f, 2.7f, 2.7f);
-    camera.lookAt(vec3(0.0f, 2.0f, 0.0f));
+    camera.lookAt(vec3(0.0f, 1.1f, 0.0f));
 
     // Setup Arcball handler.
     ArcballHandler arcball(window_width, window_height);
