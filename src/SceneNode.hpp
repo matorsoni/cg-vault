@@ -1,7 +1,7 @@
 #ifndef SCENE_NODE_HPP
 #define SCENE_NODE_HPP
 
-#include <memory>
+#include <memory>    // for std::unique_ptr
 #include <vector>
 
 #include <glm/vec3.hpp>

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(cg-vault)
 
 # Specify the C++ standard.
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Build GLFW.
@@ -29,6 +29,7 @@ add_executable(
     src/Geometry.cpp
     src/Math.cpp
     src/Mesh.cpp
+    src/Scene.cpp
     src/SceneNode.cpp
     src/SimpleGui.cpp
     src/ShaderProgram.cpp

@@ -12,7 +12,7 @@
 #include "Camera.hpp"
 #include "Math.hpp"
 #include "Geometry.hpp"
-#include "SceneNode.hpp"
+#include "Scene.hpp"
 #include "SimpleGui.hpp"
 #include "ShaderProgram.hpp"
 #include "Teapot.hpp"
@@ -121,29 +121,6 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    // Create cube VertexArray.
-    VertexArray cube(createCubeWithoutIndices());
-
-    // Create square VertexArray.
-    VertexArray square(createSquare());
-
-    // Create icosahedron VertexArray.
-    Mesh ico_mesh = createIcosahedron();
-    const int subdivision_order = 3;
-    for (int i = 0; i < subdivision_order; ++i) subdivide(ico_mesh);
-    VertexArray icosahedron(ico_mesh);
-
-    // Create torus VertexArray.
-    Mesh torus_mesh = createTorus(1.0f, 0.15f);
-    VertexArray torus(torus_mesh);
-
-    // Create Teapot VertexArray.
-    const float sample_density = 2.0f;
-    VertexArray teapot(createTeapot(sample_density));
-
-    // Create debug quad.
-    Mesh quad_mesh = createQuad();
-    VertexArray quad(quad_mesh);
 
     //ShaderProgram shader_normal("../src/shader/ClippingPlane.vert",
     //                            "../src/shader/VertexColor.frag");
@@ -162,70 +139,8 @@ int main()
     ShaderProgram shader_shadow_debug("../src/shader/Debug.vert",
                                       "../src/shader/Debug.frag");
 
-    /*** Setup the scene. ***/
-    SceneNode scene;
-    // Table variables.
-    const float table_width = 2.0f;
-    const float table_depth = 1.0f;
-    const float table_height = 1.0f;
-    const float leg_width = 0.1f;
-    const float top_girth = 0.1f;
-    const float top_scale_factor = 1.1f;
-    // Table object.
-    SceneNode* table_object = scene.makeSubnode();
-    // Legs.
-    {
-        const vec3 leg_scale = vec3(leg_width, table_height, leg_width);
-        vec3 leg_position[] = {
-            vec3(table_depth/2, table_height/2, table_width/2),
-            vec3(table_depth/2, table_height/2, -table_width/2),
-            vec3(-table_depth/2, table_height/2, -table_width/2),
-            vec3(-table_depth/2, table_height/2, table_width/2)
-        };
-        for (int i = 0; i < 4; ++i) {
-            SceneNode* leg_object = table_object->makeSubnode();
-            leg_object->pos = leg_position[i];
-            leg_object->scale = leg_scale;
-            leg_object->vertex_array = &cube;
-        }
-    }
-    // Top.
-    {
-        SceneNode* top_object = table_object->makeSubnode();
-        top_object->pos = vec3(0.0f, table_height + top_girth/2, 0.0f);
-        top_object->scale = vec3(top_scale_factor * table_depth,
-                                 top_girth,
-                                 top_scale_factor * table_width);
-        top_object->vertex_array = &cube;
-    }
-
-    const float table_top_y = table_height + top_girth;
-
-    // Icosahedron object.
-    SceneNode* ico_object = scene.makeSubnode();
-    ico_object->pos = vec3{0.0f, table_top_y + 0.8f, -0.5f};
-    ico_object->scale = vec3(0.35f);
-    ico_object->vertex_array = &icosahedron;
-
-    // Torus object.
-    SceneNode* torus_object = scene.makeSubnode();
-    torus_object->pos = ico_object->pos;
-    torus_object->scale = vec3(0.5f);
-    torus_object->vertex_array = &torus;
-
-    // Teapot object.
-    SceneNode* teapot_object = scene.makeSubnode();
-    teapot_object->pos = vec3(0.0f, table_top_y + 0.01f, 0.65f);
-    teapot_object->ori_y = vec3(0.0f, 0.0f, -1.0f);
-    teapot_object->ori_z = cross(teapot_object->ori_x, teapot_object->ori_y);
-    teapot_object->scale = vec3(0.2f);
-    teapot_object->vertex_array = &teapot;
-
-    // Light source.
-    SceneNode* point_light = scene.makeSubnode();
-    point_light->pos = vec3{0.0f, 2.0f, 0.0f};
-    point_light->scale = vec3(0.1f);
-    point_light->vertex_array = &cube;
+    // Setup the scene.
+    TableScene scene;
 
     // Materials.
     PhongMaterial ico_material;
@@ -241,7 +156,7 @@ int main()
     // Setup camera.
     Camera camera(window_width, window_height);
     camera.position() = vec3(2.7f, 2.7f, 2.7f);
-    camera.lookAt(vec3(0.0f, table_top_y, 0.0f));
+    camera.lookAt(vec3(0.0f, 2.0f, 0.0f));
 
     // Setup Arcball handler.
     ArcballHandler arcball(window_width, window_height);
@@ -305,9 +220,9 @@ int main()
         // Transform camera space rotation to world space rotation.
         const mat4 arc_rotation = glm::inverse(camera.view()) * arcball.getArcRotation();
         // Move the scene accordingly.
-        scene.ori_x = arc_rotation[0];
-        scene.ori_y = arc_rotation[1];
-        scene.ori_z = arc_rotation[2];
+        scene.root()->ori_x = arc_rotation[0];
+        scene.root()->ori_y = arc_rotation[1];
+        scene.root()->ori_z = arc_rotation[2];
 
         // --- Shadow pass --- //
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -315,8 +230,8 @@ int main()
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // World light position.
-        point_light->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
-        vec3 light_position = vec3(point_light->worldTransformation()[3]);
+        scene.point_light_node->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
+        vec3 light_position = vec3(scene.point_light_node->worldTransformation()[3]);
 
         Camera light_source_camera(SHADOW_WIDTH, SHADOW_HEIGHT);
         light_source_camera.position() = light_position;
@@ -327,8 +242,8 @@ int main()
         shader_shadow.setUniformMat4f("u_light_projection",
                                       glm::value_ptr(light_source_camera.projection()));
         // Draw table for shadow pass.
-        for (int i = 0; i < table_object->subnodes.size(); ++i) {
-            auto* node = table_object->subnodes[i].get();
+        for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
+            auto* node = scene.table_node->subnodes[i].get();
             auto model = node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
             glBindVertexArray(node->vertex_array->vao);
@@ -337,26 +252,26 @@ int main()
 
         // Draw torus for shadow pass.
         {
-            auto model = torus_object->worldTransformation();
+            auto model = scene.torus_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(torus_object->vertex_array->vao);
-            torus_object->vertex_array->draw();
+            glBindVertexArray(scene.torus_node->vertex_array->vao);
+            scene.torus_node->vertex_array->draw();
         }
 
         // Draw teapot for shadow pass.
         {
-            auto model = teapot_object->worldTransformation();
+            auto model = scene.teapot_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(teapot_object->vertex_array->vao);
-            teapot_object->vertex_array->draw();
+            glBindVertexArray(scene.teapot_node->vertex_array->vao);
+            scene.teapot_node->vertex_array->draw();
         }
 
         // Draw icosahedron for shadow pass.
         {
-            auto model = ico_object->worldTransformation();
+            auto model = scene.ico_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(ico_object->vertex_array->vao);
-            ico_object->vertex_array->draw();
+            glBindVertexArray(scene.ico_node->vertex_array->vao);
+            scene.ico_node->vertex_array->draw();
         }
 
         // Render pass.
@@ -401,8 +316,8 @@ int main()
         shader.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
 
         // Draw table.
-        for (int i = 0; i < table_object->subnodes.size(); ++i) {
-            auto* node = table_object->subnodes[i].get();
+        for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
+            auto* node = scene.table_node->subnodes[i].get();
             auto model = node->worldTransformation();
             shader.setUniformVec3f("u_ka", glm::value_ptr(table_material.ka));
             shader.setUniformVec3f("u_kd", glm::value_ptr(table_material.kd));
@@ -415,26 +330,26 @@ int main()
 
         // Draw torus.
         {
-            auto model = torus_object->worldTransformation();
+            auto model = scene.torus_node->worldTransformation();
             shader.setUniformVec3f("u_ka", glm::value_ptr(torus_material.ka));
             shader.setUniformVec3f("u_kd", glm::value_ptr(torus_material.kd));
             shader.setUniformVec3f("u_ks", glm::value_ptr(torus_material.ks));
             shader.setUniform1f("u_shiny", torus_material.shiny);
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(torus_object->vertex_array->vao);
-            torus_object->vertex_array->draw();
+            glBindVertexArray(scene.torus_node->vertex_array->vao);
+            scene.torus_node->vertex_array->draw();
         }
 
         // Draw teapot.
         {
-            auto model = teapot_object->worldTransformation();
+            auto model = scene.teapot_node->worldTransformation();
             shader.setUniformVec3f("u_ka", glm::value_ptr(teapot_material.ka));
             shader.setUniformVec3f("u_kd", glm::value_ptr(teapot_material.kd));
             shader.setUniformVec3f("u_ks", glm::value_ptr(teapot_material.ks));
             shader.setUniform1f("u_shiny", teapot_material.shiny);
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(teapot_object->vertex_array->vao);
-            teapot_object->vertex_array->draw();
+            glBindVertexArray(scene.teapot_node->vertex_array->vao);
+            scene.teapot_node->vertex_array->draw();
         }
 
         // Draw icosahedron.
@@ -443,10 +358,10 @@ int main()
             shader.setUniformVec3f("u_kd", glm::value_ptr(ico_material.kd));
             shader.setUniformVec3f("u_ks", glm::value_ptr(ico_material.ks));
             shader.setUniform1f("u_shiny", ico_material.shiny);
-            auto model = ico_object->worldTransformation();
+            auto model = scene.ico_node->worldTransformation();
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(ico_object->vertex_array->vao);
-            ico_object->vertex_array->draw();
+            glBindVertexArray(scene.ico_node->vertex_array->vao);
+            scene.ico_node->vertex_array->draw();
         }
 
         // Draw light source.
@@ -454,10 +369,10 @@ int main()
             shader_light_source.use();
             shader_light_source.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
             shader_light_source.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
-            auto model = point_light->worldTransformation();
+            auto model = scene.point_light_node->worldTransformation();
             shader_light_source.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(point_light->vertex_array->vao);
-            point_light->vertex_array->draw();
+            glBindVertexArray(scene.point_light_node->vertex_array->vao);
+            scene.point_light_node->vertex_array->draw();
         }
 
         // Render GUI on top.
