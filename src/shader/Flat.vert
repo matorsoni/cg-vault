@@ -8,7 +8,6 @@ layout (location = 2) in vec2 in_tex;
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
-uniform vec4 u_clip_plane;
 
 // Phong material.
 uniform vec3 u_ka;
@@ -65,8 +64,6 @@ void main()
 
    // Outputs.
    gl_Position = u_projection * P4;
-   // Note: position is in view coords while u_clip_plane is in world coords.
-   gl_ClipDistance[0] = dot(P4, u_clip_plane);
    v_color = vec4(final_color, 1.0);
    v_tex = in_tex;
 }

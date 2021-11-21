@@ -25,7 +25,7 @@ using glm::vec3;
 using glm::vec4;
 
 // GLFW error calback.
-static void error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
 }
@@ -72,7 +72,7 @@ struct PhongMaterial
 // Main function.
 int main()
 {
-    glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(glfw_error_callback);
 
     if (!glfwInit()) {
         cout << "Failed to initialize GLFW." << endl;
@@ -114,18 +114,12 @@ int main()
     // Set OpenGL constant states.
     glClearColor(0.0f, 0.15f, 0.15f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CLIP_PLANE0);
     //glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
     //glEnable(GL_CULL_FACE);
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-
-    //ShaderProgram shader_normal("../src/shader/ClippingPlane.vert",
-    //                            "../src/shader/VertexColor.frag");
-    //ShaderProgram shader_single_color("../src/shader/ClippingPlaneSingleColor.vert",
-    //                                  "../src/shader/VertexColor.frag");
     ShaderProgram shader_flat("../src/shader/Flat.vert",
                               "../src/shader/FlatVertexColor.frag");
     ShaderProgram shader_gouraud("../src/shader/GouraudSingleColor.vert",
@@ -310,10 +304,6 @@ int main()
         shader.setUniform1f("u_ambient_coef", gui_state.ambient);
         shader.setUniform1f("u_diffuse_coef", gui_state.diffuse);
         shader.setUniform1f("u_specular_coef", gui_state.specular);
-
-        // Define clipping plane.
-        vec4 plane{-1.0f, -1.0f, -1.0f, input.clip_plane_w};
-        shader.setUniform4f("u_clip_plane", plane.x, plane.y, plane.z, plane.w);
 
         // Draw table.
         for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
