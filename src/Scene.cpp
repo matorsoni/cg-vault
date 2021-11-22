@@ -25,6 +25,13 @@ TableScene::TableScene():
 {
     assert(root_);
 
+    // Change a few material parameters.
+    table_material.ka = vec3(128.f, 83.f, 0.f) / 255.f;
+    table_material.kd = vec3(181.f, 88.f, 0.f) / 255.f;
+    teapot_material.ka = vec3(0.f, 0.f, 1.f);
+    teapot_material.kd = vec3(0.f, 213.f, 255.f) / 255.f;
+    teapot_material.shiny = 100.f;
+
     // Push mesh data to GPU.
     cube_.pushToGpu();
     square_.pushToGpu();
