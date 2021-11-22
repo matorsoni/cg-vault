@@ -15,8 +15,6 @@
 #include "Scene.hpp"
 #include "SimpleGui.hpp"
 #include "ShaderProgram.hpp"
-#include "Teapot.hpp"
-#include "VertexArray.hpp"
 
 using namespace std;
 using glm::mat4;
@@ -240,32 +238,28 @@ int main()
             auto* node = scene.table_node->subnodes[i].get();
             auto model = node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(node->vertex_array->vao);
-            node->vertex_array->draw();
+            node->mesh->draw();
         }
 
         // Draw torus for shadow pass.
         {
             auto model = scene.torus_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.torus_node->vertex_array->vao);
-            scene.torus_node->vertex_array->draw();
+            scene.torus_node->mesh->draw();
         }
 
         // Draw teapot for shadow pass.
         {
             auto model = scene.teapot_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.teapot_node->vertex_array->vao);
-            scene.teapot_node->vertex_array->draw();
+            scene.teapot_node->mesh->draw();
         }
 
         // Draw icosahedron for shadow pass.
         {
             auto model = scene.ico_node->worldTransformation();
             shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.ico_node->vertex_array->vao);
-            scene.ico_node->vertex_array->draw();
+            scene.ico_node->mesh->draw();
         }
 
         // Render pass.
@@ -314,8 +308,7 @@ int main()
             shader.setUniformVec3f("u_ks", glm::value_ptr(table_material.ks));
             shader.setUniform1f("u_shiny", table_material.shiny);
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(node->vertex_array->vao);
-            node->vertex_array->draw();
+            node->mesh->draw();
         }
 
         // Draw torus.
@@ -326,8 +319,7 @@ int main()
             shader.setUniformVec3f("u_ks", glm::value_ptr(torus_material.ks));
             shader.setUniform1f("u_shiny", torus_material.shiny);
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.torus_node->vertex_array->vao);
-            scene.torus_node->vertex_array->draw();
+            scene.torus_node->mesh->draw();
         }
 
         // Draw teapot.
@@ -338,8 +330,7 @@ int main()
             shader.setUniformVec3f("u_ks", glm::value_ptr(teapot_material.ks));
             shader.setUniform1f("u_shiny", teapot_material.shiny);
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.teapot_node->vertex_array->vao);
-            scene.teapot_node->vertex_array->draw();
+            scene.teapot_node->mesh->draw();
         }
 
         // Draw icosahedron.
@@ -350,8 +341,7 @@ int main()
             shader.setUniform1f("u_shiny", ico_material.shiny);
             auto model = scene.ico_node->worldTransformation();
             shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.ico_node->vertex_array->vao);
-            scene.ico_node->vertex_array->draw();
+            scene.ico_node->mesh->draw();
         }
 
         // Draw light source.
@@ -361,8 +351,7 @@ int main()
             shader_light_source.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
             auto model = scene.point_light_node->worldTransformation();
             shader_light_source.setUniformMat4f("u_model", glm::value_ptr(model));
-            glBindVertexArray(scene.point_light_node->vertex_array->vao);
-            scene.point_light_node->vertex_array->draw();
+            scene.point_light_node->mesh->draw();
         }
 
         // Render GUI on top.

@@ -7,7 +7,7 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "VertexArray.hpp"
+#include "Mesh.hpp"
 
 // SceneNode represents the node of a scene tree.
 struct SceneNode
@@ -15,7 +15,7 @@ struct SceneNode
 public:
 
     SceneNode();
-    SceneNode(VertexArray* vao);
+    SceneNode(Mesh* p_mesh);
     ~SceneNode();
 
     // Create a new node.
@@ -32,7 +32,7 @@ public:
 
     std::vector<std::unique_ptr<SceneNode>> subnodes;
     SceneNode* parent_node;
-    VertexArray* vertex_array;
+    Mesh* mesh;
 };
 
 #endif // SCENE_NODE_HPP

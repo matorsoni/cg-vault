@@ -3,7 +3,7 @@
 
 #include "SceneNode.hpp"
 
-#include "VertexArray.hpp"
+#include "Mesh.hpp"
 
 // TODO: Implement Scene class following the same abstractions of ASSIMP Scene.
 // - https://learnopengl.com/Model-Loading/Assimp
@@ -31,11 +31,11 @@ private:
     std::unique_ptr<SceneNode> root_;
 
     // Meshes used.
-    VertexArray cube_;
-    VertexArray square_;
-    VertexArray icosahedron_;
-    VertexArray torus_;
-    VertexArray teapot_;
+    Mesh cube_;
+    Mesh square_;
+    Mesh icosahedron_;
+    Mesh torus_;
+    Mesh teapot_;
 };
 
 #endif // SCENE_HPP

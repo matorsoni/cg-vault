@@ -16,16 +16,16 @@ SceneNode::SceneNode():
     scale(vec3(1.0f)),
     subnodes(),
     parent_node(nullptr),
-    vertex_array(nullptr)
+    mesh(nullptr)
 {
 }
 
-SceneNode::SceneNode(VertexArray* vao):
+SceneNode::SceneNode(Mesh* p_mesh):
     SceneNode()
 {
-    assert(vao != nullptr);
+    assert(p_mesh != nullptr);
 
-    vertex_array = vao;
+    mesh = p_mesh;
 }
 
 SceneNode::~SceneNode()
