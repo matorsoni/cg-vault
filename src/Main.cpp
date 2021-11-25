@@ -6,12 +6,12 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "ArcballHandler.hpp"
 #include "Camera.hpp"
 #include "Math.hpp"
 #include "Geometry.hpp"
+#include "Renderer.hpp"
 #include "Scene.hpp"
 #include "SimpleGui.hpp"
 #include "ShaderProgram.hpp"
@@ -111,18 +111,8 @@ int main()
     glViewport(0, 0, window_width, window_height);
     const float aspect_ratio = static_cast<float>(window_width) / window_height;
 
-    ShaderProgram shader_flat("../src/shader/Flat.vert",
-                              "../src/shader/FlatVertexColor.frag");
-    ShaderProgram shader_gouraud("../src/shader/GouraudSingleColor.vert",
-                                 "../src/shader/VertexColor.frag");
-    ShaderProgram shader_phong("../src/shader/Phong.vert",
-                               "../src/shader/Phong.frag");
-    ShaderProgram shader_light_source("../src/shader/LightSource.vert",
-                                      "../src/shader/VertexColor.frag");
-    ShaderProgram shader_shadow("../src/shader/Shadow.vert",
-                                "../src/shader/Shadow.frag");
-    ShaderProgram shader_shadow_debug("../src/shader/Debug.vert",
-                                      "../src/shader/Debug.frag");
+    TableSceneRenderer renderer(window_width, window_height);
+    RenderParameter render_params;
 
     // Setup the scene.
     TableScene scene;
@@ -138,27 +128,6 @@ int main()
     // Setup ImGui and GUI state.
     setupImGui(window);
     GuiState gui_state;
-
-    // Shadow stuff.
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    unsigned int depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32,
-                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    unsigned int depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    cout << glCheckFramebufferStatus(GL_FRAMEBUFFER) << " " << GL_FRAMEBUFFER_COMPLETE << endl;
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Main loop.
     double tick = glfwGetTime();
@@ -189,6 +158,12 @@ int main()
         processInput(window, camera);
         camera.isPerspective(gui_state.is_perspective);
 
+        // Update render parameters.
+        render_params.shader = gui_state.shader;
+        render_params.ambient = gui_state.ambient;
+        render_params.diffuse = gui_state.diffuse;
+        render_params.specular = gui_state.specular;
+
         // Process arcball motion.
         arcball.processInput(window);
         // Transform camera space rotation to world space rotation.
@@ -198,143 +173,11 @@ int main()
         scene.root()->ori_y = arc_rotation[1];
         scene.root()->ori_z = arc_rotation[2];
 
-        // --- Shadow pass --- //
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
         // World light position.
         scene.point_light_node->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
-        vec3 light_position = vec3(scene.point_light_node->worldTransformation()[3]);
 
-        Camera light_source_camera(SHADOW_WIDTH, SHADOW_HEIGHT);
-        light_source_camera.position() = light_position;
-        light_source_camera.lookAt(vec3(0.0f, 0.0f, 0.0f));
-        shader_shadow.use();
-        shader_shadow.setUniformMat4f("u_light_view",
-                                      glm::value_ptr(light_source_camera.view()));
-        shader_shadow.setUniformMat4f("u_light_projection",
-                                      glm::value_ptr(light_source_camera.projection()));
-        // Draw table for shadow pass.
-        for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
-            auto* node = scene.table_node->subnodes[i].get();
-            auto model = node->worldTransformation();
-            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            node->mesh->draw();
-        }
-
-        // Draw torus for shadow pass.
-        {
-            auto model = scene.torus_node->worldTransformation();
-            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.torus_node->mesh->draw();
-        }
-
-        // Draw teapot for shadow pass.
-        {
-            auto model = scene.teapot_node->worldTransformation();
-            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.teapot_node->mesh->draw();
-        }
-
-        // Draw icosahedron for shadow pass.
-        {
-            auto model = scene.ico_node->worldTransformation();
-            shader_shadow.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.ico_node->mesh->draw();
-        }
-
-        // Render pass.
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, window_width, window_height);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-
-        //shader_shadow_debug.use();
-        //shader_shadow_debug.setUniform1i("shadow_map", 0);
-        //glBindVertexArray(quad.vao);
-        //quad.draw();
-
-        // Determine shader to be used.
-        ShaderProgram& shader = //gui_state.shader == 0 ? shader_flat :
-                                //gui_state.shader == 1 ? shader_gouraud :
-                                //gui_state.shader == 2 ? shader_phong   :
-                                shader_phong;
-
-        shader.use();
-        shader.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
-        shader.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
-        shader.setUniformMat4f("u_light_view",
-                               glm::value_ptr(light_source_camera.view()));
-        shader.setUniformMat4f("u_light_projection",
-                               glm::value_ptr(light_source_camera.projection()));
-        shader.setUniform1i("shadow_map", 0);
-
-        shader.setUniform3f("u_light_position",
-                            light_position.x,
-                            light_position.y,
-                            light_position.z);
-
-        // Update lighting parameters from GUI.
-        shader.setUniform1f("u_ambient_coef", gui_state.ambient);
-        shader.setUniform1f("u_diffuse_coef", gui_state.diffuse);
-        shader.setUniform1f("u_specular_coef", gui_state.specular);
-
-        // Draw table.
-        for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
-            auto* node = scene.table_node->subnodes[i].get();
-            auto model = node->worldTransformation();
-            shader.setUniformVec3f("u_ka", glm::value_ptr(scene.table_material.ka));
-            shader.setUniformVec3f("u_kd", glm::value_ptr(scene.table_material.kd));
-            shader.setUniformVec3f("u_ks", glm::value_ptr(scene.table_material.ks));
-            shader.setUniform1f("u_shiny", scene.table_material.shiny);
-            shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            node->mesh->draw();
-        }
-
-        // Draw torus.
-        {
-            auto model = scene.torus_node->worldTransformation();
-            shader.setUniformVec3f("u_ka", glm::value_ptr(scene.torus_material.ka));
-            shader.setUniformVec3f("u_kd", glm::value_ptr(scene.torus_material.kd));
-            shader.setUniformVec3f("u_ks", glm::value_ptr(scene.torus_material.ks));
-            shader.setUniform1f("u_shiny", scene.torus_material.shiny);
-            shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.torus_node->mesh->draw();
-        }
-
-        // Draw teapot.
-        {
-            auto model = scene.teapot_node->worldTransformation();
-            shader.setUniformVec3f("u_ka", glm::value_ptr(scene.teapot_material.ka));
-            shader.setUniformVec3f("u_kd", glm::value_ptr(scene.teapot_material.kd));
-            shader.setUniformVec3f("u_ks", glm::value_ptr(scene.teapot_material.ks));
-            shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
-            shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.teapot_node->mesh->draw();
-        }
-
-        // Draw icosahedron.
-        {
-            shader.setUniformVec3f("u_ka", glm::value_ptr(scene.ico_material.ka));
-            shader.setUniformVec3f("u_kd", glm::value_ptr(scene.ico_material.kd));
-            shader.setUniformVec3f("u_ks", glm::value_ptr(scene.ico_material.ks));
-            shader.setUniform1f("u_shiny", scene.ico_material.shiny);
-            auto model = scene.ico_node->worldTransformation();
-            shader.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.ico_node->mesh->draw();
-        }
-
-        // Draw light source.
-        {
-            shader_light_source.use();
-            shader_light_source.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
-            shader_light_source.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
-            auto model = scene.point_light_node->worldTransformation();
-            shader_light_source.setUniformMat4f("u_model", glm::value_ptr(model));
-            scene.point_light_node->mesh->draw();
-        }
+        // Render scene.
+        renderer.renderTableScene(scene, camera, render_params);
 
         // Render GUI on top.
         renderGui();

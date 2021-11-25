@@ -29,6 +29,7 @@ add_executable(
     src/Geometry.cpp
     src/Math.cpp
     src/Mesh.cpp
+    src/Renderer.cpp
     src/Scene.cpp
     src/SceneNode.cpp
     src/SimpleGui.cpp
