@@ -1,10 +1,10 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include "Scene.hpp"
 #include "ShaderProgram.hpp"
 
 class Camera;
+class TableScene;
 
 // Crucial elements:
 // - Render target

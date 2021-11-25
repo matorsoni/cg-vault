@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 
 using namespace std;
+using glm::vec3;
+using glm::mat4;
 
 // Load shader source from the disk.
 static string loadShaderSource(const string& filename)
@@ -117,7 +119,7 @@ void ShaderProgram::setUniform1f(const char* uniform_name, float value) const
     glUniform1f(uniform_location, value);
 }
 
-void ShaderProgram::setUniform3f(const char* uniform_name, float x, float y, float z) const
+void ShaderProgram::setUniformVec3f(const char* uniform_name, float x, float y, float z) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
     if (uniform_location == -1) {
@@ -128,7 +130,7 @@ void ShaderProgram::setUniform3f(const char* uniform_name, float x, float y, flo
     glUniform3f(uniform_location, x, y, z);
 }
 
-void ShaderProgram::setUniformVec3f(const char* uniform_name, const float* data) const
+void ShaderProgram::setUniformVec3f(const char* uniform_name, const vec3& vec) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
     if (uniform_location == -1) {
@@ -136,10 +138,10 @@ void ShaderProgram::setUniformVec3f(const char* uniform_name, const float* data)
         return;
     }
 
-    glUniform3fv(uniform_location, 1, data);
+    glUniform3fv(uniform_location, 1, &vec[0]);
 }
 
-void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, float z, float w) const
+void ShaderProgram::setUniformVec4f(const char* uniform_name, float x, float y, float z, float w) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
     if (uniform_location == -1) {
@@ -150,7 +152,7 @@ void ShaderProgram::setUniform4f(const char* uniform_name, float x, float y, flo
     glUniform4f(uniform_location, x, y, z, w);
 }
 
-void ShaderProgram::setUniformMat4f(const char* uniform_name, const float* data) const
+void ShaderProgram::setUniformMat4f(const char* uniform_name, const mat4& mat) const
 {
     int uniform_location = glGetUniformLocation(id_, uniform_name);
     if (uniform_location == -1) {
@@ -158,5 +160,5 @@ void ShaderProgram::setUniformMat4f(const char* uniform_name, const float* data)
         return;
     }
 
-    glUniformMatrix4fv(uniform_location, 1, GL_FALSE, data);
+    glUniformMatrix4fv(uniform_location, 1, GL_FALSE, &mat[0][0]);
 }

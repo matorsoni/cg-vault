@@ -4,9 +4,9 @@
 
 #include <glad/glad.h>
 #include <glm/vec3.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "Camera.hpp"
+#include "Scene.hpp"
 
 using namespace std;
 using glm::vec3;
@@ -70,37 +70,35 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     light_source_camera.lookAt(vec3(0.0f, 0.0f, 0.0f));
 
     shader_shadow_.use();
-    shader_shadow_.setUniformMat4f("u_light_view",
-                                  glm::value_ptr(light_source_camera.view()));
-    shader_shadow_.setUniformMat4f("u_light_projection",
-                                  glm::value_ptr(light_source_camera.projection()));
+    shader_shadow_.setUniformMat4f("u_light_view", light_source_camera.view());
+    shader_shadow_.setUniformMat4f("u_light_projection", light_source_camera.projection());
 
     // Draw table for shadow pass.
     for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
         auto* node = scene.table_node->subnodes[i].get();
         auto model = node->worldTransformation();
-        shader_shadow_.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_shadow_.setUniformMat4f("u_model", model);
         node->mesh->draw();
     }
 
     // Draw torus for shadow pass.
     {
         auto model = scene.torus_node->worldTransformation();
-        shader_shadow_.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_shadow_.setUniformMat4f("u_model", model);
         scene.torus_node->mesh->draw();
     }
 
     // Draw teapot for shadow pass.
     {
         auto model = scene.teapot_node->worldTransformation();
-        shader_shadow_.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_shadow_.setUniformMat4f("u_model", model);
         scene.teapot_node->mesh->draw();
     }
 
     // Draw icosahedron for shadow pass.
     {
         auto model = scene.ico_node->worldTransformation();
-        shader_shadow_.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_shadow_.setUniformMat4f("u_model", model);
         scene.ico_node->mesh->draw();
     }
 
@@ -123,17 +121,12 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
                             shader_phong_;
 
     shader.use();
-    shader.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
-    shader.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
-    shader.setUniformMat4f("u_light_view",
-                           glm::value_ptr(light_source_camera.view()));
-    shader.setUniformMat4f("u_light_projection",
-                           glm::value_ptr(light_source_camera.projection()));
+    shader.setUniformMat4f("u_view", camera.view());
+    shader.setUniformMat4f("u_projection", camera.projection());
+    shader.setUniformMat4f("u_light_view", light_source_camera.view());
+    shader.setUniformMat4f("u_light_projection", light_source_camera.projection());
     shader.setUniform1i("shadow_map", 0);
-    shader.setUniform3f("u_light_position",
-                        light_position.x,
-                        light_position.y,
-                        light_position.z);
+    shader.setUniformVec3f("u_light_position", light_position);
 
     // Update lighting parameters from GUI.
     shader.setUniform1f("u_ambient_coef", params.ambient);
@@ -144,54 +137,54 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
         auto* node = scene.table_node->subnodes[i].get();
         auto model = node->worldTransformation();
-        shader.setUniformVec3f("u_ka", glm::value_ptr(scene.table_material.ka));
-        shader.setUniformVec3f("u_kd", glm::value_ptr(scene.table_material.kd));
-        shader.setUniformVec3f("u_ks", glm::value_ptr(scene.table_material.ks));
+        shader.setUniformVec3f("u_ka", scene.table_material.ka);
+        shader.setUniformVec3f("u_kd", scene.table_material.kd);
+        shader.setUniformVec3f("u_ks", scene.table_material.ks);
         shader.setUniform1f("u_shiny", scene.table_material.shiny);
-        shader.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader.setUniformMat4f("u_model", model);
         node->mesh->draw();
     }
 
     // Draw torus.
     {
         auto model = scene.torus_node->worldTransformation();
-        shader.setUniformVec3f("u_ka", glm::value_ptr(scene.torus_material.ka));
-        shader.setUniformVec3f("u_kd", glm::value_ptr(scene.torus_material.kd));
-        shader.setUniformVec3f("u_ks", glm::value_ptr(scene.torus_material.ks));
+        shader.setUniformVec3f("u_ka", scene.torus_material.ka);
+        shader.setUniformVec3f("u_kd", scene.torus_material.kd);
+        shader.setUniformVec3f("u_ks", scene.torus_material.ks);
         shader.setUniform1f("u_shiny", scene.torus_material.shiny);
-        shader.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader.setUniformMat4f("u_model", model);
         scene.torus_node->mesh->draw();
     }
 
     // Draw teapot.
     {
         auto model = scene.teapot_node->worldTransformation();
-        shader.setUniformVec3f("u_ka", glm::value_ptr(scene.teapot_material.ka));
-        shader.setUniformVec3f("u_kd", glm::value_ptr(scene.teapot_material.kd));
-        shader.setUniformVec3f("u_ks", glm::value_ptr(scene.teapot_material.ks));
+        shader.setUniformVec3f("u_ka", scene.teapot_material.ka);
+        shader.setUniformVec3f("u_kd", scene.teapot_material.kd);
+        shader.setUniformVec3f("u_ks", scene.teapot_material.ks);
         shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
-        shader.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader.setUniformMat4f("u_model", model);
         scene.teapot_node->mesh->draw();
     }
 
     // Draw icosahedron.
     {
-        shader.setUniformVec3f("u_ka", glm::value_ptr(scene.ico_material.ka));
-        shader.setUniformVec3f("u_kd", glm::value_ptr(scene.ico_material.kd));
-        shader.setUniformVec3f("u_ks", glm::value_ptr(scene.ico_material.ks));
+        shader.setUniformVec3f("u_ka", scene.ico_material.ka);
+        shader.setUniformVec3f("u_kd", scene.ico_material.kd);
+        shader.setUniformVec3f("u_ks", scene.ico_material.ks);
         shader.setUniform1f("u_shiny", scene.ico_material.shiny);
         auto model = scene.ico_node->worldTransformation();
-        shader.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader.setUniformMat4f("u_model", model);
         scene.ico_node->mesh->draw();
     }
 
     // Draw light source.
     {
         shader_light_source_.use();
-        shader_light_source_.setUniformMat4f("u_view", glm::value_ptr(camera.view()));
-        shader_light_source_.setUniformMat4f("u_projection", glm::value_ptr(camera.projection()));
+        shader_light_source_.setUniformMat4f("u_view", camera.view());
+        shader_light_source_.setUniformMat4f("u_projection", camera.projection());
         auto model = scene.point_light_node->worldTransformation();
-        shader_light_source_.setUniformMat4f("u_model", glm::value_ptr(model));
+        shader_light_source_.setUniformMat4f("u_model", model);
         scene.point_light_node->mesh->draw();
     }
 }
