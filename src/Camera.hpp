@@ -12,7 +12,7 @@ public:
     static glm::vec3 UP_VECTOR;
 
     Camera() = delete;
-    Camera(int screen_width, int screen_height);
+    Camera(float aspect_ratio);
 
     // Get position and orientation by reference.
     glm::vec3& position();
@@ -30,10 +30,6 @@ public:
     void changeProjection();
 
 private:
-
-    // Screen resolution.
-    int screen_width_;
-    int screen_height_;
 
     // Projection is either perspective or parallel.
     bool is_perspective_;

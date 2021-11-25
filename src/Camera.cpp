@@ -9,15 +9,14 @@ using glm::mat4;
 
 vec3 Camera::UP_VECTOR = vec3(0.0f, 1.0f, 0.0f);
 
-Camera::Camera(int screen_width, int screen_height):
-    screen_height_(screen_height),
-    screen_width_(screen_width),
+Camera::Camera(float aspect_ratio):
     is_perspective_(true),
     position_(vec3(0.0f, 0.0f, 5.0f)),
     orientation_(mat4(1.0f))
 {
+    assert(aspect_ratio > 0.0f);
+
     // Define perspective constants.
-    const float aspect_ratio = static_cast<float>(screen_width_) / screen_height_;
     const float fov_y = glm::radians(45.0f);
     const float near_plane = 0.1f;
     const float far_plane = 100.0f;

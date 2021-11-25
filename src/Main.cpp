@@ -118,7 +118,7 @@ int main()
     TableScene scene;
 
     // Setup camera.
-    Camera camera(window_width, window_height);
+    Camera camera(aspect_ratio);
     camera.position() = vec3(2.7f, 2.7f, 2.7f);
     camera.lookAt(vec3(0.0f, 1.1f, 0.0f));
 

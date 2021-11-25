@@ -22,6 +22,7 @@ struct RenderParameter
     float specular = 1.0f;
 };
 
+
 class TableSceneRenderer
 {
 public:
