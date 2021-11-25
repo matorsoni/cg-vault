@@ -12,7 +12,8 @@ vec3 Camera::UP_VECTOR = vec3(0.0f, 1.0f, 0.0f);
 Camera::Camera(float aspect_ratio):
     is_perspective_(true),
     position_(vec3(0.0f, 0.0f, 5.0f)),
-    orientation_(mat4(1.0f))
+    orientation_(mat4(1.0f)),
+    speed_(0.1f)
 {
     assert(aspect_ratio > 0.0f);
 
@@ -29,17 +30,27 @@ Camera::Camera(float aspect_ratio):
                                       near_plane, far_plane);
 }
 
-vec3& Camera::position()
+const vec3& Camera::position() const
 {
     return position_;
 }
 
-mat4& Camera::orientation()
+const mat4& Camera::orientation() const
 {
     return orientation_;
 }
 
-const mat4& Camera::view()
+const mat4& Camera::view() const
+{
+    return view_;
+}
+
+const mat4& Camera::projection() const
+{
+    return is_perspective_ ? perspective_projection_ : parallel_projection_;
+}
+
+void Camera::updateView()
 {
     // View matrix is the inverse of:
     // | .  | .  | .  | .  | -1          | .  | Ex | .  | 0  |     | 1  | 0  | 0  | .  |
@@ -55,13 +66,31 @@ const mat4& Camera::view()
 
     // Update view.
     view_ = glm::transpose(orientation_) * inv_translation;
-
-    return view_;
 }
 
-const mat4& Camera::projection()
+void Camera::setPosition(const glm::vec3& pos)
 {
-    return is_perspective_ ? perspective_projection_ : parallel_projection_;
+    position_ = pos;
+}
+
+void Camera::moveF()
+{
+    position_ -= speed_ * vec3(orientation_[2]);
+}
+
+void Camera::moveB()
+{
+    position_ += speed_ * vec3(orientation_[2]);
+}
+
+void Camera::moveR()
+{
+    position_ += speed_ * vec3(orientation_[0]);
+}
+
+void Camera::moveL()
+{
+    position_ -= speed_ * vec3(orientation_[0]);
 }
 
 void Camera::lookAt(const vec3& target)
@@ -79,9 +108,4 @@ void Camera::lookAt(const vec3& target)
 void Camera::isPerspective(bool is_perspective)
 {
     is_perspective_ = is_perspective;
-}
-
-void Camera::changeProjection()
-{
-    is_perspective_ = !is_perspective_;
 }

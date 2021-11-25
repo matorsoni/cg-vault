@@ -29,7 +29,10 @@ public:
 
     TableSceneRenderer(int screen_width, int screen_height);
 
-    void renderTableScene(const TableScene& scene, Camera& camera, const RenderParameter& params);
+    void renderTableScene(const TableScene& scene,
+                          const Camera& camera,
+                          const RenderParameter& params);
+
     void renderPhongMaterial();
 
 private:

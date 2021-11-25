@@ -48,15 +48,14 @@ static void processInput(GLFWwindow* window, Camera& camera)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 
     // Process camera movement.
-    static const float camera_speed = 0.1f;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.position() -= camera_speed * vec3(camera.orientation()[2]);
+        camera.moveF();
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.position() += camera_speed * vec3(camera.orientation()[2]);
+        camera.moveB();
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.position() += camera_speed * vec3(camera.orientation()[0]);
+        camera.moveR();
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.position() -= camera_speed * vec3(camera.orientation()[0]);
+        camera.moveL();
 }
 
 
@@ -119,7 +118,7 @@ int main()
 
     // Setup camera.
     Camera camera(aspect_ratio);
-    camera.position() = vec3(2.7f, 2.7f, 2.7f);
+    camera.setPosition(vec3(2.7f, 2.7f, 2.7f));
     camera.lookAt(vec3(0.0f, 1.1f, 0.0f));
 
     // Setup Arcball handler.
@@ -175,6 +174,9 @@ int main()
 
         // World light position.
         scene.point_light_node->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
+
+        // Update camera view before rendering.
+        camera.updateView();
 
         // Render scene.
         renderer.renderTableScene(scene, camera, render_params);

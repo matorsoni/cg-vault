@@ -55,7 +55,7 @@ TableSceneRenderer::TableSceneRenderer(int screen_width, int screen_height):
 }
 
 void TableSceneRenderer::renderTableScene(const TableScene& scene,
-                                          Camera& camera,
+                                          const Camera& camera,
                                           const RenderParameter& params)
 {
     // --- Shadow pass --- //
@@ -66,8 +66,9 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     // Define light source camera.
     Camera light_source_camera(static_cast<float>(shadow_map_width_) / shadow_map_height_);
     vec3 light_position = vec3(scene.point_light_node->worldTransformation()[3]);
-    light_source_camera.position() = light_position;
+    light_source_camera.setPosition(light_position);
     light_source_camera.lookAt(vec3(0.0f, 0.0f, 0.0f));
+    light_source_camera.updateView();
 
     shader_shadow_.use();
     shader_shadow_.setUniformMat4f("u_light_view", light_source_camera.view());

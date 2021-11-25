@@ -15,19 +15,29 @@ public:
     Camera(float aspect_ratio);
 
     // Get position and orientation by reference.
-    glm::vec3& position();
-    glm::mat4& orientation();
+    const glm::vec3& position() const;
+    const glm::mat4& orientation() const;
 
-    // Update transformations and return by reference.
-    const glm::mat4& view();
-    const glm::mat4& projection();
+    // Get transformations by reference.
+    const glm::mat4& view() const;
+    const glm::mat4& projection() const;
+
+    // Update view transformation.
+    // TODO: Maybe this should be a private method...
+    void updateView();
+
+    void setPosition(const glm::vec3& pos);
+    // Move forwards, backwards, right, left.
+    void moveF();
+    void moveB();
+    void moveR();
+    void moveL();
 
     // Update camera orientation to follow the target.
     void lookAt(const glm::vec3& target);
 
     // Change projection type.
     void isPerspective(bool is_perspective);
-    void changeProjection();
 
 private:
 
@@ -47,6 +57,9 @@ private:
     glm::mat4 view_;
     glm::mat4 perspective_projection_;
     glm::mat4 parallel_projection_;
+
+    // Moving speed.
+    float speed_;
 };
 
 #endif // CAMERA_HPP
