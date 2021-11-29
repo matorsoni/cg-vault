@@ -7,7 +7,7 @@ layout (location = 2) in vec2 in_tex;
 out vec3 P;
 out vec3 N;
 out vec3 L;
-out vec3 light_space_pos;
+out vec4 light_space_pos;
 
 // Transforms and geometry data.
 uniform mat4 u_model;
@@ -35,6 +35,5 @@ void main()
     L = normalize(light3 - P);
 
     gl_Position = u_projection * view_pos;
-    vec4 light_space_pos4 = u_light_projection * u_light_view * world_pos;
-    light_space_pos = light_space_pos4.xyz / light_space_pos4.w;
+    light_space_pos = u_light_projection * u_light_view * world_pos;
 }

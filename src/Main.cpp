@@ -173,7 +173,7 @@ int main()
         scene.root()->ori_z = arc_rotation[2];
 
         // World light position.
-        scene.point_light_node->pos = vec3{cosf(tock), 6.2f, sinf(tock)};
+        scene.point_light_node->pos = vec3{4*cosf(tock), 6.2f, 4*sinf(tock)};
 
         // Update camera view before rendering.
         camera.updateView();
