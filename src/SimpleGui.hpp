@@ -12,9 +12,6 @@ struct GuiState
     float S = 1.0f;
     float V = 1.0f;
 
-    // Shader.
-    int shader = 0;
-
     // Lighting parameters.
     float ambient = 0.2f;
     float diffuse = 1.0f;

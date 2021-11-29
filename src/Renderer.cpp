@@ -12,10 +12,6 @@ using namespace std;
 using glm::vec3;
 
 TableSceneRenderer::TableSceneRenderer(int screen_width, int screen_height):
-    shader_flat_("../src/shader/Flat.vert",
-                 "../src/shader/FlatVertexColor.frag"),
-    shader_gouraud_("../src/shader/GouraudSingleColor.vert",
-                    "../src/shader/VertexColor.frag"),
     shader_phong_("../src/shader/Phong.vert",
                   "../src/shader/Phong.frag"),
     shader_light_source_("../src/shader/LightSource.vert",
@@ -116,10 +112,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     //quad.draw();
 
     // Determine shader to be used.
-    ShaderProgram& shader = //params.shader == 0 ? shader_flat :
-                            //params.shader == 1 ? shader_gouraud :
-                            //params.shader == 2 ? shader_phong_   :
-                            shader_phong_;
+    ShaderProgram& shader = shader_phong_;
 
     shader.use();
     shader.setUniformMat4f("u_view", camera.view());

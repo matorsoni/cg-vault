@@ -158,7 +158,6 @@ int main()
         camera.isPerspective(gui_state.is_perspective);
 
         // Update render parameters.
-        render_params.shader = gui_state.shader;
         render_params.ambient = gui_state.ambient;
         render_params.diffuse = gui_state.diffuse;
         render_params.specular = gui_state.specular;

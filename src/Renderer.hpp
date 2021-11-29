@@ -13,9 +13,6 @@ class TableScene;
 
 struct RenderParameter
 {
-    // Shader.
-    int shader = 0;
-
     // Lighting parameters.
     float ambient = 0.2f;
     float diffuse = 1.0f;
@@ -37,8 +34,6 @@ public:
 
 private:
 
-    ShaderProgram shader_flat_;
-    ShaderProgram shader_gouraud_;
     ShaderProgram shader_phong_;
     ShaderProgram shader_light_source_;
     ShaderProgram shader_shadow_;
