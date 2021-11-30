@@ -4,10 +4,14 @@ layout (location = 0) in vec3 in_pos;
 layout (location = 1) in vec3 in_normal;
 layout (location = 2) in vec2 in_tex;
 
+// Vectors in camera space.
 out vec3 P;
 out vec3 N;
 out vec3 L;
+// Vector in projection light space.
 out vec4 light_space_pos;
+// Texture coords.
+out vec2 tex_coords;
 
 // Transforms and geometry data.
 uniform mat4 u_model;
@@ -36,4 +40,6 @@ void main()
 
     gl_Position = u_projection * view_pos;
     light_space_pos = u_light_projection * u_light_view * world_pos;
+
+    tex_coords = in_tex;
 }

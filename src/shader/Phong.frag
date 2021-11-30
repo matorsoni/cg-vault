@@ -4,6 +4,7 @@ in vec3 P;
 in vec3 N;
 in vec3 L;
 in vec4 light_space_pos;
+in vec2 tex_coords;
 
 out vec4 FragColor;
 
@@ -20,6 +21,8 @@ uniform float u_specular_coef;
 
 // Shadow map texture.
 uniform sampler2D shadow_map;
+// Regular texture.
+uniform sampler2D object_texture;
 
 const vec3 light_color = vec3(1.0, 1.0, 1.0);
 const float depth_bias = 0.0001;
@@ -41,14 +44,16 @@ void main()
     vec3 normal = normalize(N);
     vec3 light  = normalize(L);
 
+    vec4 tex_color = texture(object_texture, tex_coords);
+
     // Lighting components.
-    vec3 ambient = u_ambient_coef * u_ka;
+    vec3 ambient = u_ambient_coef * u_ka * vec3(tex_color);
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
 
     float incidence = dot(light, normal);
     if (incidence >= 0.0) {
-        diffuse = u_diffuse_coef * incidence * u_kd;
+        diffuse = u_diffuse_coef * incidence * u_kd * vec3(tex_color);
 
         // Reflected light vector.
         vec3 R = reflect(-light, normal);

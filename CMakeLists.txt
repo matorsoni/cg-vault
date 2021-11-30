@@ -35,6 +35,7 @@ add_executable(
     src/SimpleGui.cpp
     src/ShaderProgram.cpp
     src/Teapot.cpp
+    src/Texture.cpp
     src/Vertex.cpp
 )
 

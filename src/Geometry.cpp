@@ -337,8 +337,10 @@ Mesh createTorus(float radius_a, float radius_b)
     vector<Vertex> vertices;
     for (int j = 0; j < num_samples_v; ++j) {
         for (int i = 0; i < num_samples_u; ++i) {
-            const float theta = i * step_u * 2 * PI;
-            const float phi   = j * step_v * 2 * PI;
+            const float u = i * step_u;
+            const float v = j * step_v;
+            const float theta = u * 2 * PI;
+            const float phi   = v * 2 * PI;
             const float cos_theta = cosf(theta);
             const float sin_theta = sin(theta);
             const float cos_phi   = cosf(phi);
@@ -354,7 +356,7 @@ Mesh createTorus(float radius_a, float radius_b)
             const float n_y = sin_phi;
             const float n_z = cos_phi * cos_theta;
 
-            vertices.emplace_back(vec3{pos_x, pos_y, pos_z}, vec3{n_x, n_y, n_z});
+            vertices.emplace_back(vec3{pos_x, pos_y, pos_z}, vec3{n_x, n_y, n_z}, vec2{u, v});
         }
     }
 
@@ -391,7 +393,7 @@ Mesh createBezierPatch(const vector<vec3>& control_points,
             const auto sample = bezierSurfaceSample(control_points, rows, cols, u, v);
             const vec3 position = get<0>(sample);
             const vec3 normal = get<1>(sample);
-            mesh.vertices.emplace_back(position, normal);
+            mesh.vertices.emplace_back(position, normal, vec2(u, v));
 
             v += col_step;
         }

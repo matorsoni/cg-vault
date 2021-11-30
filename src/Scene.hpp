@@ -1,11 +1,14 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include <vector>
+
 #include <glm/vec3.hpp>
 
-#include "SceneNode.hpp"
-
 #include "Mesh.hpp"
+#include "SceneNode.hpp"
+#include "Texture.hpp"
+
 
 // TODO: Implement Scene class following the same abstractions of ASSIMP Scene.
 // - https://learnopengl.com/Model-Loading/Assimp
@@ -42,6 +45,9 @@ public:
     PhongMaterial torus_material;
     PhongMaterial table_material;
     PhongMaterial teapot_material;
+
+    // Textures.
+    std::vector<Texture> textures;
 
 private:
 

@@ -131,44 +131,56 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
         auto* node = scene.table_node->subnodes[i].get();
         auto model = node->worldTransformation();
+        shader.setUniformMat4f("u_model", model);
         shader.setUniformVec3f("u_ka", scene.table_material.ka);
         shader.setUniformVec3f("u_kd", scene.table_material.kd);
         shader.setUniformVec3f("u_ks", scene.table_material.ks);
         shader.setUniform1f("u_shiny", scene.table_material.shiny);
-        shader.setUniformMat4f("u_model", model);
+
+        scene.textures[0].bind(1);
+        shader.setUniform1i("object_texture", 1);
         node->mesh->draw();
     }
 
     // Draw torus.
     {
         auto model = scene.torus_node->worldTransformation();
+        shader.setUniformMat4f("u_model", model);
         shader.setUniformVec3f("u_ka", scene.torus_material.ka);
         shader.setUniformVec3f("u_kd", scene.torus_material.kd);
         shader.setUniformVec3f("u_ks", scene.torus_material.ks);
         shader.setUniform1f("u_shiny", scene.torus_material.shiny);
-        shader.setUniformMat4f("u_model", model);
+
+        scene.textures[1].bind(1);
+        shader.setUniform1i("object_texture", 1);
         scene.torus_node->mesh->draw();
     }
 
     // Draw teapot.
     {
         auto model = scene.teapot_node->worldTransformation();
+        shader.setUniformMat4f("u_model", model);
         shader.setUniformVec3f("u_ka", scene.teapot_material.ka);
         shader.setUniformVec3f("u_kd", scene.teapot_material.kd);
         shader.setUniformVec3f("u_ks", scene.teapot_material.ks);
         shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
-        shader.setUniformMat4f("u_model", model);
+
+        scene.textures[2].bind(1);
+        shader.setUniform1i("object_texture", 1);
         scene.teapot_node->mesh->draw();
     }
 
     // Draw icosahedron.
     {
+        auto model = scene.ico_node->worldTransformation();
+        shader.setUniformMat4f("u_model", model);
         shader.setUniformVec3f("u_ka", scene.ico_material.ka);
         shader.setUniformVec3f("u_kd", scene.ico_material.kd);
         shader.setUniformVec3f("u_ks", scene.ico_material.ks);
         shader.setUniform1f("u_shiny", scene.ico_material.shiny);
-        auto model = scene.ico_node->worldTransformation();
-        shader.setUniformMat4f("u_model", model);
+
+        scene.textures[3].bind(1);
+        shader.setUniform1i("object_texture", 1);
         scene.ico_node->mesh->draw();
     }
 

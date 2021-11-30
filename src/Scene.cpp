@@ -25,6 +25,12 @@ TableScene::TableScene():
 {
     assert(root_);
 
+    // Load textures.
+    textures.emplace_back("../assets/wood3.jpeg");
+    textures.emplace_back("../assets/wood1.jpeg");
+    textures.emplace_back("../assets/black-brick2.jpg");
+    textures.emplace_back("../assets/chess.jpeg");
+
     // Change a few material parameters.
     table_material.ka = vec3(128.f, 83.f, 0.f) / 255.f;
     table_material.kd = vec3(181.f, 88.f, 0.f) / 255.f;
