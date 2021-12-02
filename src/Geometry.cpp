@@ -313,6 +313,53 @@ Mesh createIcosahedron()
 }
 
 
+Mesh createSphere(int n_latitude, int n_longitude)
+{
+    // Spherical coords with Y as up vector:
+    // x = cos(phi)sin(theta)
+    // y = sin(phi)
+    // z = cos(phi)cos(theta)
+    // theta in [0, 2pi]
+    // phi   in [-pi, pi]
+
+    // Add top vertice.
+    vector<Vertex> vertices;
+    vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec2(0.5f, 1.0f));
+/*
+    float phi = 0.0f;
+    // Add the 5 vertices below the first one.
+    for (float theta = 0.0f; theta < 2*PI - 0.01f; theta += d_theta) {
+        vec3 r{cosf(phi)*sinf(theta),
+               sinf(phi),
+               cosf(phi)*cosf(theta)};
+        vertices.emplace_back(r, r);
+    }
+
+    // Add the next 5 vertices.
+    for (float theta = 0.0f; theta < 2*PI - 0.01f; theta += d_theta) {
+        vec3 r{cosf(-phi)*sinf(theta + d_theta/2),
+               sinf(-phi),
+               cosf(-phi)*cosf(theta + d_theta/2)};
+        vertices.emplace_back(r, r);
+    }
+*/
+    // Add last vertice.
+    vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f));
+
+    // Define triangles.
+    vector<unsigned int> indices = {
+        // Top part.
+        0,1,2,  0,2,3,  0,3,4,  0,4,5,  0,5,1,
+        // Middle part.
+        1,6,2,  2,6,7,  2,7,3,  3,7,8,  3,8,4,  4,8,9,  4,9,5,  5,9,10,  5,10,1,  1,10,6,
+        // Bottom part.
+        11,7,6,  11,8,7,  11,9,8,  11,10,9,  11,6,10
+    };
+
+    return Mesh(vertices, indices);
+}
+
+
 Mesh createSubdividedIcosahedron(int order)
 {
     assert(order >= 0);

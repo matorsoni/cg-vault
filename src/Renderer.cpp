@@ -134,6 +134,10 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
     shader.setUniform1f("u_diffuse_coef", params.diffuse);
     shader.setUniform1f("u_specular_coef", params.specular);
 
+    // Set texture sampler slot.
+    const int sampler_slot = 1;
+    shader.setUniform1i("object_texture", sampler_slot);
+
     // Draw table.
     for (int i = 0; i < scene.table_node->subnodes.size(); ++i) {
         auto* node = scene.table_node->subnodes[i].get();
@@ -144,9 +148,10 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.table_material.ks);
         shader.setUniform1f("u_shiny", scene.table_material.shiny);
 
-        scene.textures[0].bind(1);
-        shader.setUniform1i("object_texture", 1);
+        const auto& tex = scene.textures[0];
+        tex.bind(sampler_slot);
         node->mesh->draw();
+        tex.unbind();
     }
 
     // Draw torus.
@@ -158,9 +163,10 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.torus_material.ks);
         shader.setUniform1f("u_shiny", scene.torus_material.shiny);
 
-        scene.textures[1].bind(1);
-        shader.setUniform1i("object_texture", 1);
+        const auto& tex = scene.textures[1];
+        tex.bind(sampler_slot);
         scene.torus_node->mesh->draw();
+        tex.unbind();
     }
 
     // Draw teapot.
@@ -172,9 +178,10 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.teapot_material.ks);
         shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
 
-        scene.textures[2].bind(1);
-        shader.setUniform1i("object_texture", 1);
+        const auto& tex = scene.textures[2];
+        tex.bind(sampler_slot);
         scene.teapot_node->mesh->draw();
+        tex.unbind();
     }
 
     // Draw icosahedron.
@@ -186,23 +193,25 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.ico_material.ks);
         shader.setUniform1f("u_shiny", scene.ico_material.shiny);
 
-        scene.textures[3].bind(1);
-        shader.setUniform1i("object_texture", 1);
+        const auto& tex = scene.textures[3];
+        tex.bind(sampler_slot);
         scene.ico_node->mesh->draw();
+        tex.unbind();
     }
 
     // Draw floor.
     {
         auto model = scene.floor_node->worldTransformation();
         shader.setUniformMat4f("u_model", model);
-        shader.setUniformVec3f("u_ka", scene.ico_material.ka);
-        shader.setUniformVec3f("u_kd", scene.ico_material.kd);
-        shader.setUniformVec3f("u_ks", scene.ico_material.ks);
-        shader.setUniform1f("u_shiny", scene.ico_material.shiny);
+        shader.setUniformVec3f("u_ka", scene.floor_material.ka);
+        shader.setUniformVec3f("u_kd", scene.floor_material.kd);
+        shader.setUniformVec3f("u_ks", scene.floor_material.ks);
+        shader.setUniform1f("u_shiny", scene.floor_material.shiny);
 
-        scene.textures[1].bind(1);
-        shader.setUniform1i("object_texture", 1);
+        const auto& tex = scene.textures[1];
+        tex.bind(sampler_slot);
         scene.floor_node->mesh->draw();
+        tex.unbind();
     }
 
     // Draw light source.

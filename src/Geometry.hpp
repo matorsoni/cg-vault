@@ -19,6 +19,8 @@ Mesh createSquare();
 
 Mesh createIcosahedron();
 
+Mesh createSphere(int n_latitude, int n_longitude);
+
 Mesh createSubdividedIcosahedron(int order);
 
 Mesh createTorus(float radius_a, float radius_b);

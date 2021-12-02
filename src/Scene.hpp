@@ -18,9 +18,9 @@
 // Simple phong material parameters.
 struct PhongMaterial
 {
-    glm::vec3 ka{0.0f, 0.0f, 0.0f};
-    glm::vec3 kd{0.0f, 1.0f, 0.0f};
-    glm::vec3 ks{1.0f, 1.0f, 1.0f};
+    glm::vec3 ka{1.0f};
+    glm::vec3 kd{1.0f};
+    glm::vec3 ks{1.0f};
     float shiny{10.0f};
 };
 
@@ -46,6 +46,7 @@ public:
     PhongMaterial torus_material;
     PhongMaterial table_material;
     PhongMaterial teapot_material;
+    PhongMaterial floor_material;
 
     // Textures.
     std::vector<Texture> textures;

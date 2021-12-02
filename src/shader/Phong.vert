@@ -17,9 +17,9 @@ out vec2 tex_coords;
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform mat4 u_projection;
+// Light source data and transforms.
 uniform mat4 u_light_view;
 uniform mat4 u_light_projection;
-
 uniform vec3 u_light_position;
 
 void main()
