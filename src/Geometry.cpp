@@ -324,7 +324,7 @@ Mesh createSphere(int n_latitude, int n_longitude)
 
     assert (n_latitude  > 1);
     assert (n_longitude > 1);
-    const float phi_start =  PI * 0.5f - 0.1f;
+    const float phi_start =  PI * 0.5f - 0.01f;
     const float phi_end   = -phi_start;
     const float phi_step  = (phi_end - phi_start) / (n_latitude);
     const float theta_step = 2 * PI / (n_longitude);
