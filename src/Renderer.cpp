@@ -163,7 +163,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.torus_material.ks);
         shader.setUniform1f("u_shiny", scene.torus_material.shiny);
 
-        const auto& tex = scene.textures[1];
+        const auto& tex = scene.textures[2];
         tex.bind(sampler_slot);
         scene.torus_node->mesh->draw();
         tex.unbind();
@@ -178,7 +178,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.teapot_material.ks);
         shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
 
-        const auto& tex = scene.textures[2];
+        const auto& tex = scene.textures[3];
         tex.bind(sampler_slot);
         scene.teapot_node->mesh->draw();
         tex.unbind();
@@ -193,7 +193,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.sphere_material.ks);
         shader.setUniform1f("u_shiny", scene.sphere_material.shiny);
 
-        const auto& tex = scene.textures[3];
+        const auto& tex = scene.textures[4];
         tex.bind(sampler_slot);
         scene.sphere_node->mesh->draw();
         tex.unbind();

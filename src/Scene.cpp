@@ -26,17 +26,17 @@ TableScene::TableScene():
     assert(root_);
 
     // Load textures.
-    textures.emplace_back("../assets/wood3.jpeg");
+    textures.emplace_back("../assets/wood0.jpeg");
     textures.emplace_back("../assets/wood1.jpeg");
-    textures.emplace_back("../assets/black-brick2.jpg");
+    textures.emplace_back("../assets/psycho0.jpeg");
+    textures.emplace_back("../assets/psycho1.jpeg");
     textures.emplace_back("../assets/chess.jpeg");
 
     // Change a few material parameters.
     table_material.ka = vec3(128.f, 83.f, 0.f) / 255.f;
     table_material.kd = vec3(181.f, 88.f, 0.f) / 255.f;
-    teapot_material.ka = vec3(0.f, 0.f, 1.f);
-    teapot_material.kd = vec3(0.f, 213.f, 255.f) / 255.f;
-    teapot_material.shiny = 100.f;
+    sphere_material.ka = vec3(0.1f, 0.1f, 0.6f);
+    teapot_material.shiny = 200.f;
 
     // Push mesh data to GPU.
     cube_.pushToGpu();
