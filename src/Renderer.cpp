@@ -92,11 +92,11 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         scene.teapot_node->mesh->draw();
     }
 
-    // Draw icosahedron for shadow pass.
+    // Draw Sphere for shadow pass.
     {
-        auto model = scene.ico_node->worldTransformation();
+        auto model = scene.sphere_node->worldTransformation();
         shader_shadow_.setUniformMat4f("u_model", model);
-        scene.ico_node->mesh->draw();
+        scene.sphere_node->mesh->draw();
     }
 
     // Draw floor for shadow pass.
@@ -184,18 +184,18 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         tex.unbind();
     }
 
-    // Draw icosahedron.
+    // Draw sphere.
     {
-        auto model = scene.ico_node->worldTransformation();
+        auto model = scene.sphere_node->worldTransformation();
         shader.setUniformMat4f("u_model", model);
-        shader.setUniformVec3f("u_ka", scene.ico_material.ka);
-        shader.setUniformVec3f("u_kd", scene.ico_material.kd);
-        shader.setUniformVec3f("u_ks", scene.ico_material.ks);
-        shader.setUniform1f("u_shiny", scene.ico_material.shiny);
+        shader.setUniformVec3f("u_ka", scene.sphere_material.ka);
+        shader.setUniformVec3f("u_kd", scene.sphere_material.kd);
+        shader.setUniformVec3f("u_ks", scene.sphere_material.ks);
+        shader.setUniform1f("u_shiny", scene.sphere_material.shiny);
 
         const auto& tex = scene.textures[3];
         tex.bind(sampler_slot);
-        scene.ico_node->mesh->draw();
+        scene.sphere_node->mesh->draw();
         tex.unbind();
     }
 

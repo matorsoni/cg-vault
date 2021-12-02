@@ -35,14 +35,14 @@ public:
 
     // Scene objects.
     SceneNode* table_node;
-    SceneNode* ico_node;
+    SceneNode* sphere_node;
     SceneNode* torus_node;
     SceneNode* teapot_node;
     SceneNode* floor_node;
     SceneNode* point_light_node;
 
     // Phong materials.
-    PhongMaterial ico_material;
+    PhongMaterial sphere_material;
     PhongMaterial torus_material;
     PhongMaterial table_material;
     PhongMaterial teapot_material;
@@ -59,7 +59,7 @@ private:
     // Meshes used.
     Mesh cube_;
     Mesh square_;
-    Mesh icosahedron_;
+    Mesh sphere_;
     Mesh torus_;
     Mesh teapot_;
 };

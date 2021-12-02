@@ -150,8 +150,8 @@ int main()
         const vec3 inv_color = hsvToRgb(gui_state.H > 180.f ? gui_state.H - 180.f : gui_state.H + 180.f,
                                         gui_state.S,
                                         gui_state.V);
-        scene.ico_material  .kd = gui_color;
-        scene.torus_material.kd = inv_color;
+        scene.sphere_material.kd = gui_color;
+        scene.torus_material. kd = inv_color;
 
         // GLFW input handling.
         processInput(window, camera);

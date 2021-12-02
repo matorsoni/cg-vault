@@ -320,41 +320,37 @@ Mesh createSphere(int n_latitude, int n_longitude)
     // y = sin(phi)
     // z = cos(phi)cos(theta)
     // theta in [0, 2pi]
-    // phi   in [-pi, pi]
+    // phi   in [-pi/2, pi/2]
 
-    // Add top vertice.
+    assert (n_latitude  > 1);
+    assert (n_longitude > 1);
+    const float phi_start =  PI * 0.5f - 0.1f;
+    const float phi_end   = -phi_start;
+    const float phi_step  = (phi_end - phi_start) / (n_latitude);
+    const float theta_step = 2 * PI / (n_longitude);
+
     vector<Vertex> vertices;
-    vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec2(0.5f, 1.0f));
-/*
-    float phi = 0.0f;
-    // Add the 5 vertices below the first one.
-    for (float theta = 0.0f; theta < 2*PI - 0.01f; theta += d_theta) {
-        vec3 r{cosf(phi)*sinf(theta),
-               sinf(phi),
-               cosf(phi)*cosf(theta)};
-        vertices.emplace_back(r, r);
-    }
+    // TODO: add north and south pole vertices.
+    //vertices.emplace_back(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec2(0.5f, 1.0f));
+    //vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f));
 
-    // Add the next 5 vertices.
-    for (float theta = 0.0f; theta < 2*PI - 0.01f; theta += d_theta) {
-        vec3 r{cosf(-phi)*sinf(theta + d_theta/2),
-               sinf(-phi),
-               cosf(-phi)*cosf(theta + d_theta/2)};
-        vertices.emplace_back(r, r);
+    float phi = phi_start;
+    for (int i = 0; i < n_latitude; ++i) {
+        float theta = 0.0f;
+        float v = static_cast<float>(i) / n_latitude;
+        for (int j = 0; j < n_longitude; ++j) {
+            vec3 r{cosf(phi) * sinf(theta), sinf(phi), cosf(phi) * cosf(theta)};
+            float u = static_cast<float>(j) / n_longitude;
+            vertices.emplace_back(r, r, vec2{u, v});
+
+            theta += theta_step;
+        }
+        phi += phi_step;
     }
-*/
-    // Add last vertice.
-    vertices.emplace_back(vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f));
 
     // Define triangles.
-    vector<unsigned int> indices = {
-        // Top part.
-        0,1,2,  0,2,3,  0,3,4,  0,4,5,  0,5,1,
-        // Middle part.
-        1,6,2,  2,6,7,  2,7,3,  3,7,8,  3,8,4,  4,8,9,  4,9,5,  5,9,10,  5,10,1,  1,10,6,
-        // Bottom part.
-        11,7,6,  11,8,7,  11,9,8,  11,10,9,  11,6,10
-    };
+    vector<unsigned int> indices;
+    triangulatePatch(indices, n_latitude, n_longitude, true, false, 0);
 
     return Mesh(vertices, indices);
 }

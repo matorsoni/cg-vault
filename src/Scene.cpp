@@ -13,12 +13,12 @@ TableScene::TableScene():
     // Meshes.
     cube_(createCubeWithoutIndices()),
     square_(createSquare()),
-    icosahedron_(createSubdividedIcosahedron(3)),
+    sphere_(createSphere(30, 30)),
     torus_(createTorus(1.0f, 0.15f)),
     teapot_(createTeapot(2.0f)),
     // Objects.
     table_node(nullptr),
-    ico_node(nullptr),
+    sphere_node(nullptr),
     torus_node(nullptr),
     teapot_node(nullptr),
     point_light_node(nullptr)
@@ -41,7 +41,7 @@ TableScene::TableScene():
     // Push mesh data to GPU.
     cube_.pushToGpu();
     square_.pushToGpu();
-    icosahedron_.pushToGpu();
+    sphere_.pushToGpu();
     torus_.pushToGpu();
     teapot_.pushToGpu();
 
@@ -83,15 +83,15 @@ TableScene::TableScene():
 
     const float table_top_y = leg_height + top_height;
 
-    // Icosahedron object.
-    ico_node = root_->makeSubnode();
-    ico_node->pos = vec3{0.0f, table_top_y + 0.8f, -0.5f};
-    ico_node->scale = vec3(0.35f);
-    ico_node->mesh = &icosahedron_;
+    // Sphere object.
+    sphere_node = root_->makeSubnode();
+    sphere_node->pos = vec3{0.0f, table_top_y + 0.8f, -0.5f};
+    sphere_node->scale = vec3(0.35f);
+    sphere_node->mesh = &sphere_;
 
     // Torus object.
     torus_node = root_->makeSubnode();
-    torus_node->pos = ico_node->pos;
+    torus_node->pos = sphere_node->pos;
     torus_node->scale = vec3(0.5f);
     torus_node->mesh = &torus_;
 
