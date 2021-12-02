@@ -103,6 +103,12 @@ TableScene::TableScene():
     teapot_node->scale = vec3(0.2f);
     teapot_node->mesh = &teapot_;
 
+    // Floor plane object.
+    floor_node = root_->makeSubnode();
+    floor_node->pos = vec3(0.0f);
+    floor_node->scale = vec3(3.5f);
+    floor_node->mesh = &square_;
+
     // Light source.
     point_light_node = root_->makeSubnode();
     point_light_node->pos = vec3{0.0f, 2.0f, 0.0f};

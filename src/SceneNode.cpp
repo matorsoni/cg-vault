@@ -34,7 +34,7 @@ SceneNode::~SceneNode()
 
 SceneNode* SceneNode::makeSubnode()
 {
-    subnodes.emplace_back(new SceneNode);
+    subnodes.emplace_back(make_unique<SceneNode>());
     SceneNode* new_node = subnodes.back().get();
     new_node->parent_node = this;
 

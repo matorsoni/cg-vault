@@ -99,6 +99,13 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         scene.ico_node->mesh->draw();
     }
 
+    // Draw floor for shadow pass.
+    {
+        auto model = scene.floor_node->worldTransformation();
+        shader_shadow_.setUniformMat4f("u_model", model);
+        scene.floor_node->mesh->draw();
+    }
+
     // Render pass.
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, screen_width_, screen_height_);
@@ -182,6 +189,20 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         scene.textures[3].bind(1);
         shader.setUniform1i("object_texture", 1);
         scene.ico_node->mesh->draw();
+    }
+
+    // Draw floor.
+    {
+        auto model = scene.floor_node->worldTransformation();
+        shader.setUniformMat4f("u_model", model);
+        shader.setUniformVec3f("u_ka", scene.ico_material.ka);
+        shader.setUniformVec3f("u_kd", scene.ico_material.kd);
+        shader.setUniformVec3f("u_ks", scene.ico_material.ks);
+        shader.setUniform1f("u_shiny", scene.ico_material.shiny);
+
+        scene.textures[1].bind(1);
+        shader.setUniform1i("object_texture", 1);
+        scene.floor_node->mesh->draw();
     }
 
     // Draw light source.

@@ -60,6 +60,8 @@ private:
 
     // Moving speed.
     float speed_;
+    // Vertical field of view.
+    float fov_;
 };
 
 #endif // CAMERA_HPP

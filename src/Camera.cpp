@@ -13,18 +13,18 @@ Camera::Camera(float aspect_ratio):
     is_perspective_(true),
     position_(vec3(0.0f, 0.0f, 5.0f)),
     orientation_(mat4(1.0f)),
-    speed_(0.1f)
+    speed_(0.1f),
+    fov_(glm::radians(45.0f))
 {
     assert(aspect_ratio > 0.0f);
 
     // Define perspective constants.
-    const float fov_y = glm::radians(45.0f);
     const float near_plane = 0.1f;
     const float far_plane = 100.0f;
     const float ortho_factor = 2.0f;
 
     // Build projection matrices.
-    perspective_projection_ = glm::perspective(fov_y, aspect_ratio, near_plane, far_plane);
+    perspective_projection_ = glm::perspective(fov_, aspect_ratio, near_plane, far_plane);
     parallel_projection_ = glm::ortho(-aspect_ratio * ortho_factor, aspect_ratio * ortho_factor,
                                       -ortho_factor, ortho_factor,
                                       near_plane, far_plane);

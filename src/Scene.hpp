@@ -38,6 +38,7 @@ public:
     SceneNode* ico_node;
     SceneNode* torus_node;
     SceneNode* teapot_node;
+    SceneNode* floor_node;
     SceneNode* point_light_node;
 
     // Phong materials.

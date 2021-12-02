@@ -257,7 +257,7 @@ Mesh createSquare()
     };
 
     vector<unsigned int> indices = {
-        0, 1, 2,
+        1, 2, 0,
         2, 3, 0
     };
 
