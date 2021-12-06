@@ -193,7 +193,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.sphere_material.ks);
         shader.setUniform1f("u_shiny", scene.sphere_material.shiny);
 
-        const auto& tex = scene.textures[4];
+        const auto& tex = scene.textures[2];
         tex.bind(sampler_slot);
         scene.sphere_node->mesh->draw();
         tex.unbind();

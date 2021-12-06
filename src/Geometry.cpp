@@ -326,8 +326,8 @@ Mesh createSphere(int n_latitude, int n_longitude)
     assert (n_longitude > 1);
     const float phi_start =  PI * 0.5f - 0.01f;
     const float phi_end   = -phi_start;
-    const float phi_step  = (phi_end - phi_start) / (n_latitude);
-    const float theta_step = 2 * PI / (n_longitude);
+    const float phi_step  = (phi_end - phi_start) / (n_latitude - 1);
+    const float theta_step = 2 * PI / (n_longitude - 1);
 
     vector<Vertex> vertices;
     // TODO: add north and south pole vertices.
@@ -337,10 +337,10 @@ Mesh createSphere(int n_latitude, int n_longitude)
     float phi = phi_start;
     for (int i = 0; i < n_latitude; ++i) {
         float theta = 0.0f;
-        float v = static_cast<float>(i) / n_latitude;
+        float v = static_cast<float>(i) / (n_latitude - 1);
         for (int j = 0; j < n_longitude; ++j) {
             vec3 r{cosf(phi) * sinf(theta), sinf(phi), cosf(phi) * cosf(theta)};
-            float u = static_cast<float>(j) / n_longitude;
+            float u = static_cast<float>(j) / (n_longitude - 1);
             vertices.emplace_back(r, r, vec2{u, v});
 
             theta += theta_step;
@@ -350,7 +350,7 @@ Mesh createSphere(int n_latitude, int n_longitude)
 
     // Define triangles.
     vector<unsigned int> indices;
-    triangulatePatch(indices, n_latitude, n_longitude, true, false, 0);
+    triangulatePatch(indices, n_latitude, n_longitude, false, false, 0);
 
     return Mesh(vertices, indices);
 }
@@ -374,8 +374,8 @@ Mesh createTorus(float radius_a, float radius_b)
 
     const int num_samples_u = 30;
     const int num_samples_v = 20;
-    const float step_u = 1.0f / num_samples_u;
-    const float step_v = 1.0f / num_samples_v;
+    const float step_u = 1.0f / (num_samples_u - 1);
+    const float step_v = 1.0f / (num_samples_v - 1);
 
     vector<Vertex> vertices;
     for (int j = 0; j < num_samples_v; ++j) {
@@ -404,7 +404,7 @@ Mesh createTorus(float radius_a, float radius_b)
     }
 
     vector<unsigned int> indices;
-    triangulatePatch(indices, num_samples_v, num_samples_u, true, true);
+    triangulatePatch(indices, num_samples_v, num_samples_u, false, false);
 
     return Mesh(vertices, indices);
 }
