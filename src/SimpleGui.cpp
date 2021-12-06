@@ -40,9 +40,14 @@ void setupGuiFrame(GuiState& gui_state)
         ImGui::Text("- Click and drag to rotate the scene.");
         ImGui::Text("\n");
 
-        ImGui::Text("UI input:");
+        ImGui::Text("Projection type:");
+        ImGui::RadioButton("Perspective", &gui_state.is_perspective, 1);   ImGui::SameLine();
+        ImGui::RadioButton("Orthogonal",  &gui_state.is_perspective, 0);
 
-        ImGui::Checkbox("Perspective projection", &gui_state.is_perspective);
+        ImGui::Text("Teapot textures:");
+        ImGui::RadioButton("Wood",   &gui_state.teapot_tex, 1);   ImGui::SameLine();
+        ImGui::RadioButton("Chess",  &gui_state.teapot_tex, 2);   ImGui::SameLine();
+        ImGui::RadioButton("Psycho", &gui_state.teapot_tex, 3);
 
         ImGui::SliderFloat("H value", &gui_state.H, 0.0f, 360.0f);
         ImGui::SliderFloat("S value", &gui_state.S, 0.0f, 1.0f);

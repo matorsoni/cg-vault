@@ -178,7 +178,7 @@ void TableSceneRenderer::renderTableScene(const TableScene& scene,
         shader.setUniformVec3f("u_ks", scene.teapot_material.ks);
         shader.setUniform1f("u_shiny", scene.teapot_material.shiny);
 
-        const auto& tex = scene.textures[3];
+        const auto& tex = scene.textures[params.teapot_tex];
         tex.bind(sampler_slot);
         scene.teapot_node->mesh->draw();
         tex.unbind();

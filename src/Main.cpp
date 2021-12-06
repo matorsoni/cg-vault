@@ -161,6 +161,7 @@ int main()
         render_params.ambient = gui_state.ambient;
         render_params.diffuse = gui_state.diffuse;
         render_params.specular = gui_state.specular;
+        render_params.teapot_tex = gui_state.teapot_tex;
 
         // Process arcball motion.
         arcball.processInput(window);

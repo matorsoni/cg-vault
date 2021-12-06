@@ -17,6 +17,9 @@ struct RenderParameter
     float ambient = 0.2f;
     float diffuse = 1.0f;
     float specular = 1.0f;
+
+    // Teapot texture.
+    int teapot_tex = 3;
 };
 
 

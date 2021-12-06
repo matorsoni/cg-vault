@@ -6,7 +6,7 @@ struct GLFWwindow;
 
 struct GuiState
 {
-    bool is_perspective = true;
+    int is_perspective = true;
     double time_per_frame = 1.0;
     float H = 0.0f;
     float S = 1.0f;
@@ -16,6 +16,9 @@ struct GuiState
     float ambient = 0.2f;
     float diffuse = 1.0f;
     float specular = 1.0f;
+
+    // Teapot texture.
+    int teapot_tex = 3;
 };
 
 void setupImGui(GLFWwindow* window);
