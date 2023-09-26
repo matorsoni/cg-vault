@@ -1,5 +1,17 @@
 # cg-vault
 Experiments with 3D graphics using OpenGL.
+Part of the coursework of discipline IA725 - Computer Graphics 1 (2021-s2).
+https://www.dca.fee.unicamp.br/cursos/IA725/2s2021/
+
+Features:
+- Patch triangulation, used to generate sphere and torus mesh;
+- Bézier surface for Teapot mesh creation;
+- Perspective and orthogonal camera projection;
+- RGB - HSV conversion;
+- Simple object texturing;
+- Phong shading;
+- Simple UI to control scene rendering parameters;
+- Shadow mapping.
 
 ## Build instructions
 
@@ -14,6 +26,11 @@ make
 ```
 
 ## A few samples...
+
+- Final scene rendering
+
+![Screenshot from 2023-09-25 21-32-56](https://github.com/matorsoni/cg-vault/assets/33296520/6c743482-764d-4a02-8a43-a062c1661fc4)
+
 
 - Commit 339f049
 
